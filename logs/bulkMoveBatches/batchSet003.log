@@ -1,0 +1,32 @@
+2020-04-08 16:36:31,910  INFO [main] - Connected to P8 Domain ICM532
+2020-04-08 16:36:31,919  INFO [main] - Start generating batch set data file. Start docid : 100000.0
+2020-04-08 16:36:31,924  INFO [main] - SELECT TOP 3000 F_DOCNUMBER FROM ICRIS_Reg_Doc WITH INCLUDESUBCLASSES WHERE F_DOCNUMBER>=100000.0 ORDER BY F_DOCNUMBER ASC
+2020-04-08 16:36:32,513  INFO [main] - SELECT TOP 3000 F_DOCNUMBER FROM ICRIS_Reg_Doc WITH INCLUDESUBCLASSES WHERE F_DOCNUMBER>=104008.0 ORDER BY F_DOCNUMBER ASC
+2020-04-08 16:36:33,017  INFO [main] - SELECT TOP 3000 F_DOCNUMBER FROM ICRIS_Reg_Doc WITH INCLUDESUBCLASSES WHERE F_DOCNUMBER>=107020.0 ORDER BY F_DOCNUMBER ASC
+2020-04-08 16:36:33,481  INFO [main] - SELECT TOP 3000 F_DOCNUMBER FROM ICRIS_Reg_Doc WITH INCLUDESUBCLASSES WHERE F_DOCNUMBER>=110032.0 ORDER BY F_DOCNUMBER ASC
+2020-04-08 16:36:33,737  INFO [main] - SELECT TOP 3000 F_DOCNUMBER FROM ICRIS_Reg_Doc WITH INCLUDESUBCLASSES WHERE F_DOCNUMBER>=114052.0 ORDER BY F_DOCNUMBER ASC
+2020-04-08 16:36:33,748  INFO [main] - End generating batch set data file. Next docid : 0.0
+2020-04-08 16:41:42,587  INFO [main] - Connected to P8 Domain ICM532
+2020-04-08 16:41:42,589  INFO [main] - Start generating batch set data file. Start docid : 113865.0
+2020-04-08 16:41:42,596  INFO [main] - SELECT TOP 3000 F_DOCNUMBER FROM ICRIS_Reg_Doc WITH INCLUDESUBCLASSES WHERE F_DOCNUMBER>=113865.0 ORDER BY F_DOCNUMBER ASC
+2020-04-08 16:41:42,668  INFO [main] - SELECT TOP 3000 F_DOCNUMBER FROM ICRIS_Reg_Doc WITH INCLUDESUBCLASSES WHERE F_DOCNUMBER>=114052.0 ORDER BY F_DOCNUMBER ASC
+2020-04-08 16:41:42,679  INFO [main] - End generating batch set data file. Next docid : 0.0
+2020-04-08 16:45:49,335  INFO [main] - Connected to P8 Domain ICM532
+2020-04-08 16:45:49,338  INFO [main] - Start generating batch set data file. Start docid : 113865.0
+2020-04-08 16:45:49,341  INFO [main] - SELECT TOP 3000 F_DOCNUMBER FROM ICRIS_Reg_Doc WITH INCLUDESUBCLASSES WHERE F_DOCNUMBER>=113865.0 ORDER BY F_DOCNUMBER ASC
+2020-04-08 16:45:49,408  INFO [main] - SELECT TOP 3000 F_DOCNUMBER FROM ICRIS_Reg_Doc WITH INCLUDESUBCLASSES WHERE F_DOCNUMBER>=114052.0 ORDER BY F_DOCNUMBER ASC
+2020-04-08 16:45:49,419  INFO [main] - End generating batch set data file. Next docid : 0.0
+2020-04-08 16:49:30,536  INFO [main] - Connected to P8 Domain ICM532
+2020-04-08 16:49:30,564  INFO [main] - Starting Batch Set : batchSet003
+2020-04-08 16:49:30,701  INFO [main] - Create Bulk Move Sweep Job : start docid=113865;end docid=114051;effective start time=Wed Apr 08 16:55:00 CST 2020
+2020-04-08 16:49:30,701  INFO [main] - All Bulk Move Sweep Jobs have been created : batchSet003
+2020-04-18 19:17:00,936 ERROR [main] - unhandled CPEUtil Exception
+2020-04-18 19:17:00,982 ERROR [main] - com.filenet.api.exception.EngineRuntimeException: FNRCA0031E: API_UNABLE_TO_USE_CONNECTION: The URI for server communication cannot be determined from the connection object http://icmdemo.icm.local:9081/wsi/FNCEWS40MTOM. Message was: Connection refused: connect
+2020-04-18 19:17:00,982  INFO [main] - Start generating batch set data file. Start docid : null
+2020-04-18 19:17:00,982 ERROR [main] - unhandled Exception
+2020-04-18 19:17:00,982 ERROR [main] - java.lang.NullPointerException
+2020-04-18 19:19:22,168 ERROR [main] - unhandled CPEUtil Exception
+2020-04-18 19:19:22,217 ERROR [main] - com.filenet.api.exception.EngineRuntimeException: FNRCA0031E: API_UNABLE_TO_USE_CONNECTION: The URI for server communication cannot be determined from the connection object http://icmdemo.icm.local:9081/wsi/FNCEWS40MTOM. Message was: Connection refused: connect
+2020-04-18 19:19:22,217  INFO [main] - Start generating batch set data file. Start docid : null
+2020-04-18 19:19:22,217 ERROR [main] - unhandled Exception
+2020-04-18 19:19:22,217 ERROR [main] - java.lang.NullPointerException

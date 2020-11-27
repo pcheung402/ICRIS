@@ -1,0 +1,277 @@
+<properties>
+	<property>
+		<symName>DOC_BARCODE</symName>
+		<description>Document Barcode</description>
+		<dataType>String</dataType>
+		<dataLength>20</dataLength>
+	</property>
+	<property>
+		<symName>DOC_SHT_FRM</symName>
+		<description>Document Short Form</description>
+		<dataType>String</dataType>
+		<dataLength>8</dataLength>
+	</property>
+	<property>
+		<symName>STATUS</symName>
+		<description>Document Status</description>
+		<dataType>String</dataType>
+		<dataLength>3</dataLength>
+	</property>
+	<property>
+		<symName>DOC_STATUS</symName>
+		<description>Document Status</description>
+		<dataType>String</dataType>
+		<dataLength>1</dataLength>
+	</property>
+	<property>
+		<symName>PRV_DOCID</symName>
+		<description>Previous Doc ID</description>
+		<dataType>String</dataType>
+		<dataLength>12</dataLength>
+	</property>
+	<property>
+		<symName>REF_NO</symName>
+		<description>Reference No (CR No. FM No.)</description>
+		<dataType>String</dataType>
+		<dataLength>12</dataLength>
+	</property>
+	<property>
+		<symName>REF_TYPE</symName>
+		<description>Reference Type</description>
+		<dataType>String</dataType>
+		<dataLength>10</dataLength>
+	</property>
+	<property>
+		<symName>LTST_VER</symName>
+		<description>Latest Version</description>
+		<dataType>String</dataType>
+		<dataLength>8</dataLength>
+	</property>
+	<property>
+		<symName>FLING_DATE</symName>
+		<description>Document Filing Date</description>
+		<dataType>DateTime</dataType>
+		<dataLength></dataLength>
+	</property>
+	<property>
+		<symName>PRT_VW_IND</symName>
+		<description>Print View Indicator</description>
+		<dataType>String</dataType>
+		<dataLength>1</dataLength>
+	</property>	
+	<property>
+		<symName>FRM_VER</symName>
+		<description>Shortform version</description>
+		<dataType>String</dataType>
+		<dataLength>8</dataLength>
+	</property>	
+	<property>
+		<symName>TMPLT_ID</symName>
+		<description>Template ID</description>
+		<dataType>String</dataType>
+		<dataLength>20</dataLength>
+	</property>
+	<property>
+		<symName>TMPLT_VER</symName>
+		<description>Template version</description>
+		<dataType>String</dataType>
+		<dataLength>8</dataLength>
+	</property>
+	<property>
+		<symName>FRM_TMPLT_STATUS</symName>
+		<description>Document Form/Template Status</description>
+		<dataType>String</dataType>
+		<dataLength>1</dataLength>
+	</property>	
+	<property>
+		<symName>DOC_CRNO</symName>
+		<description>CR Number</description>
+		<dataType>String</dataType>
+		<dataLength>10</dataLength>
+	</property>	
+	<property>
+		<symName>DOC_YEAR</symName>
+		<description>Year of Document</description>
+		<dataType>String</dataType>
+		<dataLength>4</dataLength>
+	</property>
+	<property>
+		<symName>DOC_SEQNO</symName>
+		<description>Document Sequence Number</description>
+		<dataType>String</dataType>
+		<dataLength>4</dataLength>
+	</property>
+	<property>
+		<symName>DOC_FILINGDATE</symName>
+		<description>Document Filing Date</description>
+		<dataType>String</dataType>
+		<dataLength>10</dataLength>
+	</property>	
+	<property>
+		<symName>DOC_ENCLOSURENO</symName>
+		<description>Document Enclosure Number</description>
+		<dataType>String</dataType>
+		<dataLength>7</dataLength>
+	</property>	
+	<property>
+		<symName>DOC_VOLUME</symName>
+		<description>Volume Name</description>
+		<dataType>String</dataType>
+		<dataLength>8</dataLength>
+	</property>
+	<property>
+		<symName>DOC_EXPCODE1</symName>
+		<description>Document Exception Code 1</description>
+		<dataType>String</dataType>
+		<dataLength>2</dataLength>
+	</property>
+	<property>
+		<symName>DOC_EXPCODE2</symName>
+		<description>Document Exception Code 2</description>
+		<dataType>String</dataType>
+		<dataLength>2</dataLength>
+	</property>	
+	<property>
+		<symName>DOC_EXPCODE3</symName>
+		<description>Document Exception Code 3</description>
+		<dataType>String</dataType>
+		<dataLength>2</dataLength>
+	</property>	
+	<property>
+		<symName>DOC_EXPREMARK</symName>
+		<description>Exception Remark</description>
+		<dataType>String</dataType>
+		<dataLength>60</dataLength>
+	</property>
+	<property>
+		<symName>DOC_VERSION</symName>
+		<description>Document Version</description>
+		<dataType>String</dataType>
+		<dataLength>2</dataLength></property>
+	<property>
+		<symName>DOC_UPDATED</symName>
+		<description>Document Updated Indicator</description>
+		<dataType>String</dataType>
+		<dataLength>2</dataLength>
+	</property>	
+	<property>
+		<symName>DOC_UPDATEDDATE</symName>
+		<description>Document Updated Date</description>
+		<dataType>DateTime</dataType>
+		<dataLength></dataLength>
+	</property>	
+	<property>
+		<symName>DOC_UPDATEDBY</symName>
+		<description>Document Updated By</description>
+		<dataType>String</dataType>
+		<dataLength>8</dataLength>
+	</property>	
+	<property>
+		<symName>DOC_VERIFIED</symName>
+		<description>Document Verified Indicator</description>
+		<dataType>String</dataType>
+		<dataLength>2</dataLength>
+	</property>
+	<property>
+		<symName>DOC_VERIFIEDDATE</symName>
+		<description>Document Verified Date</description>
+		<dataType>DateTime</dataType>
+		<dataLength></dataLength>
+	</property>	
+	<property>
+		<symName>DOC_VERIFIEDBY</symName>
+		<description>Document Verified By</description>
+		<dataType>String</dataType>
+		<dataLength>8</dataLength>
+	</property>	
+	<property>
+		<symName>DOC_PREVDOCID</symName>
+		<description>Previous Document ID</description>
+		<dataType>String</dataType>
+		<dataLength>10</dataLength>
+	</property>
+	<property>
+		<symName>DOC_DELETED</symName>
+		<description>Doc Deletion Status</description>
+		<dataType>String</dataType>
+		<dataLength>2</dataLength>
+	</property>
+	<property>
+		<symName>DOC_MIG_STATUS</symName>
+		<description>Doc. Migration Status</description>
+		<dataType>String</dataType>
+		<dataLength>5</dataLength>
+	</property>
+	<property>
+		<symName>DOC_MIG_ERR</symName>
+		<description>Document Migration Error</description>
+		<dataType>String</dataType>
+		<dataLength>200</dataLength>
+	</property>
+	<property>
+		<symName>FNP_ARCHIVE</symName>
+		<description>FNP WORM ARCHIVE DATE</description>
+		<dataType>DateTime</dataType>
+		<dataLength></dataLength>
+	</property>
+	<property>
+		<symName>F_ARCHIVEDATE</symName>
+		<description>IS Archive Date</description>
+		<dataType>DateTime</dataType>
+		<dataLength></dataLength>
+	</property>
+		<property>
+		<symName>F_DELETEDATE</symName>
+		<description>IS Delete Date</description>
+		<dataType>DateTime</dataType>
+		<dataLength></dataLength>
+	</property>
+		<property>
+		<symName>F_DOCCLASSNUMBER</symName>
+		<description>IS Doc Class Number</description>
+		<dataType>Integer</dataType>
+		<dataLength></dataLength>
+	</property>
+	<property>
+		<symName>F_DOCFORMAT</symName>
+		<description>IS Doc Format</description>
+		<dataType>String</dataType>
+		<dataLength>239</dataLength>
+	</property>
+	<property>
+		<symName>F_DOCLOCATION</symName>
+		<description>IS Doc Location</description>
+		<dataType>String</dataType>
+		<dataLength>239</dataLength>
+	</property>
+	<property>
+		<symName>F_DOCNUMBER</symName>
+		<description>IS Doc Number</description>
+		<dataType>Double</dataType>
+		<dataLength></dataLength>
+	</property>
+	<property>
+		<symName>F_DOCTYPE</symName>
+		<description>IS Doc Type</description>
+		<dataType>String</dataType>
+		<dataLength>1</dataLength>
+	</property>
+	<property>
+		<symName>F_ENTRYDATE</symName>
+		<description>IS Entry Date</description>
+		<dataType>DateTime</dataType>
+		<dataLength></dataLength>
+	</property>
+	<property>
+		<symName>F_PAGES</symName>
+		<description>IS Pages</description>
+		<dataType>Integer</dataType>
+		<dataLength></dataLength>
+	</property>
+		<property>
+		<symName>F_RETENTOFFSET</symName>
+		<description>IS Retention Offset</description>
+		<dataType>Integer</dataType>
+		<dataLength></dataLength>
+	</property>
+</properties>

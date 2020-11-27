@@ -1,0 +1,10 @@
+CPEServer = 10.114.116.82
+CPEPort = 7501
+CPE_URL = /wsi/FNCEWS40MTOM/
+CPEDomain = ICRIS
+ObjectStoreName = CMS2
+CPEUser = p8admin
+CPEPassword = Root1234
+maxNumOfeDocRetrieve=10000
+startSubmissionDate=20181230
+outputBaseDir=E:\ICRISTEMPLATEUAT

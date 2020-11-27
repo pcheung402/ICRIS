@@ -1,0 +1,48 @@
+SYM,DISP,TYPE,LEN
+DOC_BARCODE,Document Barcode,ascii,20
+DOC_SHT_FRM,Document Short Form,ascii,8
+STATUS,Document Status 2,ascii,3
+DOC_STATUS,Document Status,ascii,1
+PRV_DOCID,Previous Doc ID,ascii,12
+REF_NO,Reference No (CR No. FM No.),ascii,12
+REF_TYPE,Reference Type,ascii,10
+LTST_VER,Latest Version,ascii,8
+FLING_DATE,Document Filing Date,date,n/a
+PRT_VW_IND,Print View Indicator,ascii,1
+FRM_VER,Shortform version,ascii,8
+TMPLT_ID,Template ID,ascii,20
+TMPLT_VER,Template version,ascii,8
+FRM_TMPLT_STATUS,Document Form/Template Status,ascii,1
+DOC_CRNO,CR Number,ascii,10
+DOC_YEAR,Year of Document,ascii,4
+DOC_SEQNO,Document Sequence Number,ascii,4
+DOC_FILINGDATE,Document Filing Date,ascii,10
+DOC_ENCLOSURENO,Document Enclosure Number,ascii,7
+DOC_VOLUME,Volume Name,ascii,8
+DOC_STATUS,Document Status,ascii,1
+DOC_EXPCODE1,Document Exception Code 1,ascii,2
+DOC_EXPCODE2,Document Exception Code 2,ascii,2
+DOC_EXPCODE3,Document Exception Code 3,ascii,2
+DOC_EXPREMARK,Exception Remark,ascii,60
+DOC_VERSION,Document Version,ascii,2
+DOC_UPDATED,Document Updated Indicator,ascii,2
+DOC_UPDATEDDATE,Document Updated Date,date,n/a
+DOC_UPDATEDBY,Document Updated By,ascii,8
+DOC_VERIFIED,Document Verified Indicator,ascii,2
+DOC_VERIFIEDDATE,Document Verified Date,date,n/a
+DOC_VERIFIEDBY,Document Verified By,ascii,8
+DOC_PREVDOCID,Previous Document ID,ascii,10
+DOC_DELETED,Doc Deletion Status,ascii,2
+DOC_MIG_STATUS,Doc. Migration Status,ascii,5
+DOC_MIG_ERR,Document Migration Error,ascii,200
+FNP_ARCHIVE,FNP WORM ARCHIVE DATE,date,n/a
+F_ARCHIVEDATE,IS Archive Date,date,n/a
+F_DELETEDATE,IS Delete Date,date,n/a
+F_DOCCLASSNUMBER,IS Doc Class Number,integer,4
+F_DOCFORMAT,IS Doc Format,ascii,239
+F_DOCLOCATION,IS Doc Location,ascii,239
+F_DOCNUMBER,IS Doc Number, double,10
+F_DOCTYPE,IS Doc Type,ascii,1
+F_ENTRYDATE,IS Entry Date,date,n/a
+F_PAGES,IS Pages,integer,4
+F_RETENTOFFSET,IS Retention Offset,integer,4

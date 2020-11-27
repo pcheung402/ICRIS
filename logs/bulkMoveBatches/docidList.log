@@ -1,0 +1,4 @@
+2020-08-17 17:15:40,408 ERROR [main] - unhandled CPEUtil Exception
+2020-08-17 17:15:40,409 ERROR [main] - java.io.FileNotFoundException: config\batchSetConfig\docidList.conf (The system cannot find the file specified)
+2020-08-17 17:15:40,409  INFO [main] - Starting Batch Set : docidList
+2020-08-17 17:15:43,024  INFO [main] - All Bulk Move Sweep Jobs have been created : docidList

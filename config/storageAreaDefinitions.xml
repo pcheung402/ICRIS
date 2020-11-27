@@ -1,0 +1,5 @@
+<StoragePolicy GUID='{D0E3B575-0000-C61A-BFDC-9382DF499632}'>TEST_sp
+	<StorageArea rootDirectoryPath='/WAS_FN/FileStores/OS/FSA1'>FSA1</StorageArea>
+	<StorageArea rootDirectoryPath='/WAS_FN/FileStores/OS/FSA2'>FSA2</StorageArea>
+	<StorageArea rootDirectoryPath='/WAS_FN/FileStores/OS/FSA3'>FSA3</StorageArea>
+</StoragePolicy>
