@@ -16,6 +16,9 @@ public class Tester {
 		// TODO Auto-generated method stub
 		System.out.println("java.security.auth.login.config : "+ System.getProperty("java.security.auth.login.config"));
 		try {
+			/*
+			 * Connect to CPE using CEUtil
+			 */
 			log = new ICRISLogger("Test",null);
 			revampedCPEUtil = new CPEUtil("revamped.server.conf", null);
 			objectStore = revampedCPEUtil.getObjectStore();
