@@ -18,6 +18,8 @@ public class Tester {
 		try {
 			/*
 			 * Connect to CPE using CEUtil
+			 * 
+			 * Changes committed to branch icrisicris8
 			 */
 			log = new ICRISLogger("Test",null);
 			revampedCPEUtil = new CPEUtil("revamped.server.conf", null);
