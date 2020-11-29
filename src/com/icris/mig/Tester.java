@@ -19,14 +19,6 @@ public class Tester {
 			/*
 			 * Connect to CPE using CEUtil
 			 * 
-<<<<<<< HEAD
-			 * Changes committed to branch
-=======
-			 * Changes committed to branch icrisicris8
-			 * 
-			 * Added by icrisicris8... 
-			 * 
->>>>>>> refs/remotes/ICRIS/master
 			 */
 			log = new ICRISLogger("Test",null);
 			revampedCPEUtil = new CPEUtil("revamped.server.conf", null);
