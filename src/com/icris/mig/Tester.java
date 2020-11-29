@@ -21,7 +21,7 @@ public class Tester {
 			 * 
 			 * Changes committed to branch icrisicris8
 			 * 
-			 * Added by icrisicris8......
+			 * Added by icrisicris8...
 			 * 
 			 */
 			log = new ICRISLogger("Test",null);
