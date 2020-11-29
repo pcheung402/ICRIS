@@ -19,6 +19,7 @@ public class Tester {
 			/*
 			 * Connect to CPE using CEUtil
 			 * modified by icrisicris8
+			 * modified by pcheung402
 			 * 
 			 */
 			log = new ICRISLogger("Test",null);
