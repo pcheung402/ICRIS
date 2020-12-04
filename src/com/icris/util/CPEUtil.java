@@ -72,36 +72,41 @@ public class CPEUtil {
 	        		break;
 	        	}
 	        }
-        	if(os==null) {
-        		throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_INVALID_OS_NAME, "Invalid Objec Store Name in File revamp.server.conf");
-        	}
-        	sps = os.get_StoragePolicies();
-        	Iterator<StoragePolicy> itsp=sps.iterator();
-        	while (itsp.hasNext()) {
-        		StoragePolicy temp = itsp.next();
-        		if (temp.get_Name().equals(props.getProperty("CPESP"))) {
-        			this.sp = temp;
-        			break;
-        		}
+        	if(this.os==null) {
+        		throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_INVALID_OS_NAME, "Invalid Objec Store Name in File " + CONF_FILE_DIR);
         	}
         	
-        	if (sp==null) {
-        		throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_INVALID_SP_NAME, "Invalid Storage Policy Name in File revamp.server.conf");        		
-        	}
-        	
-        	sas = sp.get_StorageAreas();
-			Iterator<FileStorageArea> itsa = sas.iterator();
-			while (itsa.hasNext()) {
-				FileStorageArea temp = itsa.next();
-				temp.fetchProperties(new String[] {"ResourceStatus"});
-				if(temp.get_ResourceStatus().equals(ResourceStatus.OPEN)) {
-					sa = temp;
-					break;
+        if (!props.getProperty("CPESP").equals("*")) {	
+	        	this.sps = this.os.get_StoragePolicies();
+	        	Iterator<StoragePolicy> itsp=sps.iterator();
+	        	while (itsp.hasNext()) {
+	        		StoragePolicy temp = itsp.next();
+//	    			System.out.println(temp.get_DisplayName());
+	        		if (temp.get_DisplayName().equals(props.getProperty("CPESP"))) {
+//	        			System.out.println("Storage Policy found : " + temp.get_DisplayName());
+	        			this.sp = temp;
+	        			break;
+	        		}
+	        	}
+	        	
+	        	if (this.sp==null) {
+	        		throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_INVALID_SP_NAME, "Invalid Storage Policy Name in File " + CONF_FILE_DIR);        		
+	        	}
+	
+	        	sas = sp.get_StorageAreas();
+				Iterator<FileStorageArea> itsa = sas.iterator();
+				while (itsa.hasNext()) {
+					FileStorageArea temp = itsa.next();
+					temp.fetchProperties(new String[] {"ResourceStatus"});
+					if(temp.get_ResourceStatus().equals(ResourceStatus.OPEN)) {
+						sa = temp;
+						break;
+					}
 				}
+	        	if (sa==null) {
+	        		throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_INVALID_SA_NAME, "No Valid Storage Area is Found");        		
+	        	}
 			}
-        	if (sa==null) {
-        		throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_INVALID_SA_NAME, "No Valid Storagfe Area is Found");        		
-        	}
 	        isConnected = true;					
 		} catch (FileNotFoundException e) {
 			throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_CONFIG_FILE_NOT_FOUND, "File " + CONF_FILE_DIR + " not found", e);

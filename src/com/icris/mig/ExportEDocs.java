@@ -91,7 +91,7 @@ public class ExportEDocs {
 	}
 	
 	private static void initialize(String[] args) throws Exception {
-		log = new ICRISLogger("CreateDocumentClass",null);
+		log = new ICRISLogger("ExportEDocs",null);
 		icris2CPEUtil = new CPEUtil("server.properties.icris2P8",log);
 		objectStore = icris2CPEUtil.getObjectStore();
 	    startSubmissionDate = args[0];
