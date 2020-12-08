@@ -5,9 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileNotFoundException;
-import java.util.Properties;
-import java.util.Iterator;
-import java.util.Date;
+import java.util.*;
 import java.nio.file.Paths;
 import javax.security.auth.Subject;
 import com.filenet.api.collection.*;
@@ -92,20 +90,34 @@ public class CPEUtil {
 	        	if (this.sp==null) {
 	        		throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_INVALID_SP_NAME, "Invalid Storage Policy Name in File " + CONF_FILE_DIR);        		
 	        	}
-	
+	        	
+	    		/*
+	    		 *  Sort all OPEN storage area by CmStandbyActivationPriority
+	    		 */
+	    		SortedSet<FileStorageArea> saSortedSet = new TreeSet<FileStorageArea>(new Comparator<FileStorageArea>(){
+	    			public int compare(FileStorageArea one, FileStorageArea another) {
+	    				return one.get_CmStandbyActivationPriority() - another.get_CmStandbyActivationPriority() ;
+	    			}
+	    		});
 	        	sas = sp.get_StorageAreas();
 				Iterator<FileStorageArea> itsa = sas.iterator();
 				while (itsa.hasNext()) {
 					FileStorageArea temp = itsa.next();
 					temp.fetchProperties(new String[] {"ResourceStatus"});
-					if(temp.get_ResourceStatus().equals(ResourceStatus.OPEN)) {
-						sa = temp;
-						break;
+					if(temp.get_ResourceStatus().equals(ResourceStatus.OPEN) ) {
+						saSortedSet.add(temp);
 					}
+				}				
+				/*
+				 *  select the first STANDBY or OPEN storage area, if any
+				 */
+				if (!saSortedSet.isEmpty()) {
+					this.sa = saSortedSet.first();
+					return;
+				} else {
+					this.sa = null;
+					throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_SA_UNAVAILABLE, "No more standby Storage Area available"); 
 				}
-	        	if (sa==null) {
-	        		throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_INVALID_SA_NAME, "No Valid Storage Area is Found");        		
-	        	}
 			}
 	        isConnected = true;					
 		} catch (FileNotFoundException e) {
@@ -147,61 +159,73 @@ public class CPEUtil {
 	}
 	
 	public Double  getStorageAreaSize() {
-		return sa.get_ContentElementKBytes();
-//		return 0.0;
+		this.sa.refresh(new String[] {"ContentElementKBytes"});
+		return this.sa.get_ContentElementKBytes();
 	}
 	
 
 	public Boolean moveContent(Document doc) throws EngineRuntimeException, ICRISException {
 		try {
-			doc.moveContent(sa);
+			this.sa.fetchProperties(new String[] {"Id"});
+			doc.moveContent(this.sa);
 			doc.save(RefreshMode.NO_REFRESH);
 			return Boolean.TRUE;
 		} catch (EngineRuntimeException e) {
 			if (e.getExceptionCode().equals(ExceptionCode.CONTENT_FCA_SAVE_FAILED)) {
-				log.info("CONTENT_FCA_SAVE_FAILED" + "," + sa.get_DisplayName());
-				FileStorageArea newSa = getNextStorageArea();
-				sa = newSa;
-				sa.set_ResourceStatus(ResourceStatus.OPEN);
-				sa.save(RefreshMode.REFRESH);
-				sa.refresh();
+				log.info("CONTENT_FCA_SAVE_FAILED" + "," + this.sa.get_DisplayName());
+				getNextStorageArea();;
 				doc.refresh(new String[] {"StorageArea", "NAME"});
-//				System.out.println("switch to next Storage Area" + "," + sa.get_DisplayName());
-				return Boolean.FALSE;
+				return Boolean.FALSE; /* content move fail, retry, switch to next storage area and retry */
 			}
 			
 			if (e.getExceptionCode().equals(ExceptionCode.CONTENT_SA_STORAGE_AREA_NOT_OPEN)) {
-				log.info("CONTENT_SA_STORAGE_AREA_NOT_OPEN"+ "," + sa.get_DisplayName());
-				sa.set_ResourceStatus(ResourceStatus.OPEN);
-				sa.save(RefreshMode.REFRESH);				
-				sa.refresh();
-				return Boolean.FALSE;
+				log.info("CONTENT_SA_STORAGE_AREA_NOT_OPEN"+ "," + this.sa.get_DisplayName());
+				this.sa.set_ResourceStatus(ResourceStatus.OPEN);
+				this.sa.save(RefreshMode.REFRESH);
+				return Boolean.FALSE; /* content move fail, retry, switch to next storage area and retry */
 			}
-			throw e;
+			throw e; /* unhandled exception */
 		}
 	}
 	
-	private FileStorageArea getNextStorageArea() throws ICRISException, ICRISException{
-		Integer saPri = sa.get_CmStandbyActivationPriority();
+	private void getNextStorageArea() throws ICRISException, ICRISException{
+		this.sa.set_ResourceStatus(ResourceStatus.FULL); /* change the current storage area to FULL */
+		this.sa.save(RefreshMode.REFRESH);
+		log.info(String.format("%s is FULL", sa.get_DisplayName()).toString());
+		Integer saPri = this.sa.get_CmStandbyActivationPriority();
 		StoragePolicy sp = getStoragePolicy();
 		StorageAreaSet sas = sp.get_StorageAreas();
+		
+		/*
+		 *  Sort all STANDBY or OPEN storage area by CmStandbyActivationPriority
+		 */
+		SortedSet<FileStorageArea> saSortedSet = new TreeSet<FileStorageArea>(new Comparator<FileStorageArea>(){
+			public int compare(FileStorageArea one, FileStorageArea another) {
+				return one.get_CmStandbyActivationPriority() - another.get_CmStandbyActivationPriority() ;
+			}
+		});
 		Iterator<FileStorageArea> itsa = sas.iterator();
 		while (itsa.hasNext()) {
 			FileStorageArea temp = itsa.next();
 			temp.fetchProperties(new String[] {"ResourceStatus"});
-//			System.out.println("this SA standby priority" + ":" + temp.get_CmStandbyActivationPriority());
-			if(temp.get_ResourceStatus().equals(ResourceStatus.STANDBY) && temp.get_CmStandbyActivationPriority() > saPri) {
-				sa.set_ResourceStatus(ResourceStatus.FULL);
-				sa.save(RefreshMode.REFRESH);
-				log.info(String.format("%s is FULL", sa.get_DisplayName()).toString());
-				temp.set_ResourceStatus(ResourceStatus.OPEN);
-				temp.save(RefreshMode.REFRESH);
-//				System.out.println("Switch to next  : " + ":" + temp.get_DisplayName()+ "," + temp.get_ResourceStatus().toString());
-				log.info(String.format("%s is OPENed", temp.get_DisplayName()).toString());
-				return temp;
+			if(temp.get_ResourceStatus().equals(ResourceStatus.STANDBY)||temp.get_ResourceStatus().equals(ResourceStatus.OPEN) ) {
+				saSortedSet.add(temp);
 			}
 		}
 		
-		throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_SA_UNAVAILABLE, "No more stnadby Storage Area available"); 
+		/*
+		 *  select the first STANDBY or OPEN storage area, if any
+		 */
+		if (!saSortedSet.isEmpty()) {
+			this.sa = saSortedSet.first();
+			this.sa.set_ResourceStatus(ResourceStatus.OPEN);
+			this.sa.save(RefreshMode.REFRESH);
+			this.sa.refresh();
+			return;
+		} else {
+			this.sa = null;
+			throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_SA_UNAVAILABLE, "No more standby Storage Area available"); 
+		}	
+
 	}	
 }

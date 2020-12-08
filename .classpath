@@ -10,6 +10,5 @@
 	<classpathentry kind="lib" path="lib/xlxpScanner.jar"/>
 	<classpathentry kind="lib" path="lib/xlxpScannerUtils.jar"/>
 	<classpathentry kind="lib" path="lib/dom4j-1.6.1.jar"/>
-	<classpathentry kind="lib" path="lib/com.ibm.ws.ejb.thinclient_9.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

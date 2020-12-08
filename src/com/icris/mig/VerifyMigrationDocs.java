@@ -132,7 +132,7 @@ public class VerifyMigrationDocs {
 			}
 		}
 		if (result) {
-			verifiedSuccesOutputDataFile.write(String.format("%s, %.0f, %d : success\n", doc.get_Id().toString(), indexAnnotRec.docid, indexAnnotRec.classnum).getBytes());
+			verifiedSuccesOutputDataFile.write(String.format("%s,%.0f,%d,success\n", doc.get_Id().toString(), indexAnnotRec.docid, indexAnnotRec.classnum).getBytes());
 		} else {
 			errMsg = String.format("%s\n", errMsg);
 			verifiedFailedOutputDataFile.write(errMsg.getBytes());

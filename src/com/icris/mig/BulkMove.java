@@ -32,18 +32,20 @@ public class BulkMove {
 		File folder = new File("data/bulkMoveBatches/batchSets/" + batchSetId);
 		File[] listOfFiles = folder.listFiles();
 		intialSASize = revampedCPEUtil.getStorageAreaSize();
-		log.info(String.format("Start submiiting %d batches", listOfFiles.length));
+		log.info(String.format("Start submitting %d batches", listOfFiles.length));
 		for (File fd : listOfFiles) {
 			es.execute(new BulkMoverManager(batchSetId, fd.getName(), log, bulkMoveOutputDataFile,  revampedCPEUtil, isByDocid));
 		}		
 		es.shutdown();
 		try {
-			boolean finished = es.awaitTermination(1, TimeUnit.DAYS);
-			log.info("All batches finished");
-			finalSASize = revampedCPEUtil.getStorageAreaSize();
-			log.info(String.format("%.3f MB moved", (finalSASize - intialSASize)/1024));
+			boolean finished = es.awaitTermination(7, TimeUnit.DAYS);
 			bulkMoveOutputDataFile.flush();
 			bulkMoveOutputDataFile.close();
+			log.info("All batches finished");
+			log.info("Wait 5 minutes and calculate total storage moved in MB");
+			Thread.sleep(5*60*1000);
+			finalSASize = revampedCPEUtil.getStorageAreaSize();
+			log.info(String.format("Initial Storage Size: %.3f(MB), Final Storage Size: %.3f(MB), Total Moved : %.3f(MB)", intialSASize/1024, finalSASize/1024, (finalSASize - intialSASize)/1024));
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

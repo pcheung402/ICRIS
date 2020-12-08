@@ -11,7 +11,7 @@ import java.io.FileNotFoundException;
 import java.nio.file.Paths;
 
 public class ICRISLogger {
-	static Logger log;
+	private Logger log;
 	public ICRISLogger(String log_Id, String log_dir) throws ICRISException {
 		// TODO Auto-generated constructor stub
 		try {
@@ -24,7 +24,7 @@ public class ICRISLogger {
 			}
 			LogManager.resetConfiguration();
 			PropertyConfigurator.configure(props);
-			log = Logger.getLogger(ReplicateToWORM.class.getName());			
+			log = Logger.getLogger("com.icris");			
 		} catch(FileNotFoundException e) {
 			throw new ICRISException(ICRISException.ExceptionCodeValue.BM_LOG4J_CONF_NOT_FOUND,"log4j.properties not found", e);
 		} catch(IOException e) {

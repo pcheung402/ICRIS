@@ -22,7 +22,7 @@ public class Tester {
 			 * modified by pcheung402
 			 * 
 			 */
-			log = new ICRISLogger("Test",null);
+			log = new ICRISLogger("Tester","Tester");
 			revampedCPEUtil = new CPEUtil("revamped.server.conf", null);
 			objectStore = revampedCPEUtil.getObjectStore();
 			log.info("Connected to : " + revampedCPEUtil.getDomain().get_Name() + ";" +revampedCPEUtil.getObjectStore().get_Name());

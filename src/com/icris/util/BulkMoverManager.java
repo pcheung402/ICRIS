@@ -120,7 +120,7 @@ public class BulkMoverManager implements Runnable {
 				} else {
 					doc = Factory.Document.fetchInstance(revampedCPEUtil.getObjectStore(), new Id(parsedLine[1]), null);
 				}
-				doc.refresh(new String[] {"F_DOCNUMBER","F_DOCCLASSNUMBER"});
+				doc.refresh(new String[] {"F_DOCNUMBER","F_DOCCLASSNUMBER","Id"});
 				lastDocNumberMoved = doc.getProperties().getFloat64Value("F_DOCNUMBER");
 				if (numOfDocMoved==0) {
 					firstDocNumberMoved = doc.getProperties().getFloat64Value("F_DOCNUMBER");
@@ -147,7 +147,8 @@ public class BulkMoverManager implements Runnable {
 							log.error(String.format("CFS-IS Error ,%s/%s,%s",batchSetId,datFileName,lastDocNumberMoved,e.getMessage()));
 							continue;
 						} else {
-							log.error(String.format("unhandled error ,%s/%s,%s",batchSetId,datFileName,lastDocNumberMoved,e.getMessage()));
+							log.error(String.format("unhandled error ,%s/%s,%.0f, %s",batchSetId,datFileName,lastDocNumberMoved,e.getMessage()));
+							e.printStackTrace();
 							break;
 						}	
 					}
