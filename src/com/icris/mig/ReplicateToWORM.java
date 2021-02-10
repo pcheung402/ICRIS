@@ -57,7 +57,6 @@ public class ReplicateToWORM {
 		} else {
 			batchSetId = "batchSet001";
 		}
-		
 		if (args.length > 1 && args[1].equals("-d")) {
 			isByDocid = true;
 		}

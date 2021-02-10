@@ -40,6 +40,10 @@ public class ICRISLogger {
 	public void error(String errMessage) {
 		log.error(errMessage);
 	}
+	
+	public void warn(String logMessage){
+		log.warn(logMessage);
+	}
 
 	
 }

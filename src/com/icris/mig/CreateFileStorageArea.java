@@ -26,6 +26,7 @@ import com.icris.util.CSVParser;
 import com.icris.util.ICRISException;
 import com.icris.util.ICRISLogger;
 import com.filenet.api.constants.RefreshMode;
+import com.filenet.api.constants.ResourceStatus;
 import com.filenet.api.core.Connection;
 import com.filenet.api.core.Domain;
 import com.filenet.api.core.Factory;
@@ -57,26 +58,32 @@ public class CreateFileStorageArea {
 			doc.getDocumentElement().normalize();
 			NodeList storagePolicyNodeList = doc.getElementsByTagName("StoragePolicy");
 			Node storagePolicyNode = storagePolicyNodeList.item(0);
-//			StoragePolicy sp = Factory.StoragePolicy.fetchInstance(objectStore, new Id(storagePolicyNode.getAttributes().getNamedItem("GUID").getNodeValue()), null);
-//			sp.refresh(new String[]{"StorageAreas"});
-//			StorageAreaSet saSet = sp.get_StorageAreas(); 
-//			Iterator it = saSet.iterator();
-//			while(it.hasNext()) {
-//				it.remove();
-//			}
-			
-//			if (saSet.isEmpty()) System.out.println("Storage policy is empty");
+			storagePolicyNode.getAttributes().getNamedItem("GUID").getNodeValue();
+			StoragePolicy sp = Factory.StoragePolicy.fetchInstance(objectStore, new Id(storagePolicyNode.getAttributes().getNamedItem("GUID").getNodeValue()), null);			
 			NodeList storageAreaNodeList = storagePolicyNode.getChildNodes();
-
+			String fsaFilterExpression = "Id IN (";
 			for (int j = 0; j < storageAreaNodeList.getLength(); j++) {
 				Node storageAreaNode =storageAreaNodeList.item(j);
-//				Element storageAreaElement =(Element) storageAreaNode;
 				if(storageAreaNode.getNodeName().equals("StorageArea")) {
+					String fsaDisplayName = storageAreaNode.getTextContent();
 					NamedNodeMap nnm = storageAreaNode.getAttributes();
 					String rootDirectoryPath = nnm.getNamedItem("rootDirectoryPath").getNodeValue();
-					String fsaDisplayName = storageAreaNode.getTextContent();
-					FileStorageArea fsa = createFileStorageArea(fsaDisplayName,rootDirectoryPath);
+					Integer fsaStandbyActivationPriority = Integer.parseInt(nnm.getNamedItem("StandbyActivationPriority").getNodeValue());
+					FileStorageArea fsa;
+					switch (nnm.getNamedItem("ResourceStatus").getNodeValue()) {
+					case "Open":	fsa = createFileStorageArea(fsaDisplayName,rootDirectoryPath, fsaStandbyActivationPriority, ResourceStatus.OPEN);
+									break;
+					case "Standby":	fsa = createFileStorageArea(fsaDisplayName,rootDirectoryPath, fsaStandbyActivationPriority, ResourceStatus.STANDBY);
+									break;
+					default:	fsa = createFileStorageArea(fsaDisplayName,rootDirectoryPath, fsaStandbyActivationPriority, ResourceStatus.STANDBY);
+								break;
+					};
+					fsaFilterExpression =  fsaFilterExpression + fsa.get_Id().toString() + ",";
 				}
+				
+				fsaFilterExpression = fsaFilterExpression.substring(0, fsaFilterExpression.length() - 1); // remove the last ","
+				fsaFilterExpression = fsaFilterExpression + ")";
+				sp.set_FilterExpression(fsaFilterExpression);
 			}
 								
 		} catch (ICRISException e) {
@@ -95,10 +102,12 @@ public class CreateFileStorageArea {
 		}
 	}
 	
-	private static FileStorageArea createFileStorageArea(String fsaDisplayName, String rootDirectoryPath) throws Exception{
+	private static FileStorageArea createFileStorageArea(String fsaDisplayName, String rootDirectoryPath, Integer fsaStandbyActivationPriority, ResourceStatus fsaResourceStatus) throws Exception{
 		System.out.print(String.format("%s, %s\n", fsaDisplayName, rootDirectoryPath));
 		FileStorageArea fsa = Factory.FileStorageArea.createInstance(objectStore, "FileStorageArea", null);
 		fsa.set_RootDirectoryPath(rootDirectoryPath);
+		fsa.set_CmStandbyActivationPriority(fsaStandbyActivationPriority);
+		fsa.set_ResourceStatus(fsaResourceStatus);
 		fsa.set_CmCompressionEnabled(false);
 		fsa.set_DuplicateSuppressionEnabled(false);
 		fsa.set_DisplayName(fsaDisplayName);

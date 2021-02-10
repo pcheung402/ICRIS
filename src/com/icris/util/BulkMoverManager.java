@@ -126,8 +126,8 @@ public class BulkMoverManager implements Runnable {
 					firstDocNumberMoved = doc.getProperties().getFloat64Value("F_DOCNUMBER");
 				}
 				numOfDocMoved++;
-//				Integer retries = 0;
-				for (Integer retries= 0 ; retries < 5; ++retries) {
+				Integer retries = 0;
+				for (retries= 0 ; retries < 5; ++retries) {
 					try {
 //						doc.moveContent(destStorageArea);
 //						doc.save(RefreshMode.REFRESH);
@@ -144,7 +144,7 @@ public class BulkMoverManager implements Runnable {
 						if (e.getExceptionCode().equals(ExceptionCode.CONTENT_FCP_OPERATION_FAILED)
 								||e.getExceptionCode().equals(ExceptionCode.CONTENT_FCP_OPERATION_FAILED_ON_OPEN)
 								||e.getExceptionCode().equals(ExceptionCode.CONTENT_FCP_OPERATION_FAILED_WITH_CONTENT)) {
-							log.error(String.format("CFS-IS Error ,%s/%s,%s",batchSetId,datFileName,lastDocNumberMoved,e.getMessage()));
+							log.warn(String.format("CFS-IS retry #%d: %s/%s,%12.0f,%s",retries, batchSetId,datFileName,lastDocNumberMoved,e.getMessage()));
 							continue;
 						} else {
 							log.error(String.format("unhandled error ,%s/%s,%.0f, %s",batchSetId,datFileName,lastDocNumberMoved,e.getMessage()));
@@ -153,7 +153,9 @@ public class BulkMoverManager implements Runnable {
 						}	
 					}
 				}
-
+				if(retries >=5 ) {
+					log.error(String.format("CFS-IS error ,%s/%s",batchSetId,datFileName,lastDocNumberMoved));
+				}
 			}
 			reader.close();
 
