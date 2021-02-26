@@ -120,21 +120,22 @@ public class BulkMoverManager implements Runnable {
 				} else {
 					doc = Factory.Document.fetchInstance(revampedCPEUtil.getObjectStore(), new Id(parsedLine[1]), null);
 				}
-				doc.refresh(new String[] {"F_DOCNUMBER","F_DOCCLASSNUMBER","Id"});
+				doc.refresh(new String[] {"F_DOCNUMBER","F_DOCCLASSNUMBER","Id","F_PAGES"});
 				lastDocNumberMoved = doc.getProperties().getFloat64Value("F_DOCNUMBER");
 				if (numOfDocMoved==0) {
 					firstDocNumberMoved = doc.getProperties().getFloat64Value("F_DOCNUMBER");
 				}
 				numOfDocMoved++;
 				Integer retries = 0;
-				for (retries= 0 ; retries < 5; ++retries) {
+//				for (retries= 0 ; retries < 5; ++retries) {
+				for (retries= 0 ; retries < revampedCPEUtil.getCFSISRetries(); ++retries) {
 					try {
 //						doc.moveContent(destStorageArea);
 //						doc.save(RefreshMode.REFRESH);
 						while (!revampedCPEUtil.moveContent(doc)) {
 							try {TimeUnit.SECONDS.sleep(2);} catch (Exception _e) {_e.printStackTrace();};
 						};
-						bulkMoveOutputDataFile.write(String.format("%010.0f,%s/%s\n", lastDocNumberMoved, batchSetId,datFileName).getBytes());
+						bulkMoveOutputDataFile.write(String.format("%010.0f,%s/%s,%d\n", lastDocNumberMoved, batchSetId,datFileName, doc.getProperties().getInteger32Value("F_PAGES")).getBytes());
 						bulkMoveOutputDataFile.flush();
 						break;
 					} catch (ICRISException e) {
@@ -153,8 +154,8 @@ public class BulkMoverManager implements Runnable {
 						}	
 					}
 				}
-				if(retries >=5 ) {
-					log.error(String.format("CFS-IS error ,%s/%s",batchSetId,datFileName,lastDocNumberMoved));
+				if(retries >=revampedCPEUtil.getCFSISRetries() ) {
+					log.error(String.format("CFS-IS error ,%s/%s, %12.0f",batchSetId,datFileName,lastDocNumberMoved));
 				}
 			}
 			reader.close();

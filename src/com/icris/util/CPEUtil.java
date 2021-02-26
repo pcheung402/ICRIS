@@ -42,6 +42,7 @@ public class CPEUtil {
 	private boolean isConnected;
 	private UserContext uc;
 	private Subject sub;
+	private Integer CFS_IS_Retries;
 	
 	public CPEUtil(String configFile,ICRISLogger log) throws ICRISException{
 		this.log = log;
@@ -52,6 +53,7 @@ public class CPEUtil {
 	        Properties props = new Properties();
 	        // load a properties file
 	        props.load(input);
+	        CFS_IS_Retries = Integer.valueOf(props.getProperty("CFS_IS_Retries"));
 			String userName = props.getProperty(CPEUser);
 			String password = props.getProperty(CPEPassword);
 			String protocol = props.getProperty("Protocol", "http");
@@ -161,6 +163,10 @@ public class CPEUtil {
 	public Double  getStorageAreaSize() {
 		this.sa.refresh(new String[] {"ContentElementKBytes"});
 		return this.sa.get_ContentElementKBytes();
+	}
+	
+	public Integer getCFSISRetries() {
+		return this.CFS_IS_Retries;
 	}
 	
 
