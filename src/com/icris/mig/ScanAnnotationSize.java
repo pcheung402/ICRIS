@@ -52,13 +52,15 @@ import com.filenet.api.property.PropertyFilter;
 
 
 public class ScanAnnotationSize {
-	static boolean isAND = true;
+	static boolean isAND = false;
+	static boolean isOR = false;
 	static private CPEUtil revampedCPEUtil;
 	static private ICRISLogger log;
 	static private ObjectStore objectStore = null;
 	static private Double widthThreshold = 0.0;
 	static private Double heigthThreshold = 0.0;
-	static FileOutputStream invalidAnnotSizeReport;
+//	static FileOutputStream invalidAnnotSizeReport;
+	static FileOutputStream invalidAnnotSizeReport_A, invalidAnnotSizeReport_O;
 	static ArrayList<HashMap<String,String>> PropertiesList;
 	static private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 	static private Date curDate = new Date();
@@ -109,14 +111,14 @@ public class ScanAnnotationSize {
 		        			if (width < widthThreshold && heigth < heigthThreshold) {
 	//	        			System.out.println(String.format("%010.0f, %s, %s, %d, %f, %f",annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"),annotClassName, annotPageNum, annotUpdateSeq, width, heigth));
 	//	        				System.out.println(String.format("%010.0f, %s, %s, %f, %f",annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"),annotClassName, annotPageNum,  width, heigth));
-		        			invalidAnnotSizeReport.write(String.format("%010.0f, %s, %s,%s,%f,%f\n",annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"), annot.get_Id().toString(), annotClassName, annotPageNum,  width, heigth).getBytes());
+		        			invalidAnnotSizeReport_A.write(String.format("%010.0f, %s, %s,%s,%f,%f\n",annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"), annot.get_Id().toString(), annotClassName, annotPageNum,  width, heigth).getBytes());
 		        			}
-	        			} else {
-
+	        			}
+	        			if (isOR) {
 		        			if (width < widthThreshold || heigth < heigthThreshold) {
 	//	        			System.out.println(String.format("%010.0f, %s, %s, %d, %f, %f",annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"),annotClassName, annotPageNum, annotUpdateSeq, width, heigth));
 	//	        				System.out.println(String.format("%010.0f, %s, %s, %f, %f",annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"),annotClassName, annotPageNum,  width, heigth));
-		        			invalidAnnotSizeReport.write(String.format("%010.0f, %s, %s,%s,%f,%f\n",annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"), annot.get_Id().toString(), annotClassName, annotPageNum,  width, heigth).getBytes());
+		        			invalidAnnotSizeReport_O.write(String.format("%010.0f, %s, %s,%s,%f,%f\n",annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"), annot.get_Id().toString(), annotClassName, annotPageNum,  width, heigth).getBytes());
 		        			}	        				
 		        		}
 	        		}
@@ -125,7 +127,8 @@ public class ScanAnnotationSize {
 //    		eDocsNotFoundLog.flush();
 //    		eDocsRecords.flush();
 //    		eDocsInvalid.flush();
-	        invalidAnnotSizeReport.close();
+	        invalidAnnotSizeReport_A.close();
+	        invalidAnnotSizeReport_O.close();
     	    System.out.println("Scanning finished " + " : " + new Date());
 	    } catch (Exception e){
 	    	e.printStackTrace();
@@ -139,17 +142,30 @@ public class ScanAnnotationSize {
 //		annotSizeThreshold = Double.valueOf(args[0]);
 		widthThreshold = Double.valueOf(args[0]);
 		heigthThreshold = Double.valueOf(args[1]);
-		String invalidAnnotSizeReportFilePath = "." + File.separator + "logs" + File.separator + "invalidAnnotSizeReports" + File.separator + "invalidAnnotSize_" +simpleDateFormat.format(curDate) +"_A.dat";;
+//		String invalidAnnotSizeReportFilePath = "." + File.separator + "logs" + File.separator + "invalidAnnotSizeReports" + File.separator + "invalidAnnotSize_" +simpleDateFormat.format(curDate) +"_A.dat";
+
+
 		if (args.length > 2) {
 			if (args[2].equals("-A")) {
 				isAND = true;
-			} else {
-				isAND = false ;
-				invalidAnnotSizeReportFilePath = "." + File.separator + "logs" + File.separator + "invalidAnnotSizeReports" + File.separator + "invalidAnnotSize_" +simpleDateFormat.format(curDate) +"_O.dat";
-			}
+				isOR = false;
+				String invalidAnnotSizeReportFilePath_A = "." + File.separator + "logs" + File.separator + "invalidAnnotSizeReports" + File.separator + "invalidAnnotSize_" +simpleDateFormat.format(curDate) +"_A.dat";
+				Files.deleteIfExists(Paths.get(invalidAnnotSizeReportFilePath_A));
+				invalidAnnotSizeReport_A = new FileOutputStream(invalidAnnotSizeReportFilePath_A);
+			} 
+			if (args[2].equals("-O")) {
+				isOR = true;
+				isOR = false;
+				String invalidAnnotSizeReportFilePath_O = "." + File.separator + "logs" + File.separator + "invalidAnnotSizeReports" + File.separator + "invalidAnnotSize_" +simpleDateFormat.format(curDate) +"_O.dat";
+				Files.deleteIfExists(Paths.get(invalidAnnotSizeReportFilePath_O));
+				invalidAnnotSizeReport_O = new FileOutputStream(invalidAnnotSizeReportFilePath_O);
+			} 
+		} else {
+			isAND = true;
+			isOR = true;
 		}
-		Files.deleteIfExists(Paths.get(invalidAnnotSizeReportFilePath));
-		invalidAnnotSizeReport = new FileOutputStream(invalidAnnotSizeReportFilePath);
+
+
 	}
 	
 
