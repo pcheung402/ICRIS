@@ -70,7 +70,7 @@ public class ReplicateManager implements Runnable {
 		this.startBatchSet();
 	}
 	
-	public ReplicateManager(String batchSetId, String datFileName, ICRISLogger log, FileOutputStream ofs,  CPEUtil revampedCPEUtil, Boolean isByDocId) {
+	public ReplicateManager(String batchSetId, String datFileName, ICRISLogger log, FileOutputStream ofs,  CPEUtil revampedCPEUtil, Boolean isByDocId) throws ICRISException, IOException {
 		// TODO Auto-generated constructor stub
 		this.classNumToSymNameMap.put(1, "ICRIS_Pend_Doc");
 		this.classNumToSymNameMap.put(2, "ICRIS_Reg_Doc");
@@ -91,29 +91,14 @@ public class ReplicateManager implements Runnable {
 			System.out.println("By P8 GUID");
 		}
 		
-		try {
-			java.util.Properties props = new java.util.Properties();
-			props.load(new FileInputStream("config/replicateConfig/" + this.batchSetId + ".conf"));
-			this.docidSymbolicName = props.getProperty("docidSymbolicName");
-//			this.FSA = props.getProperty("FSA");
-//			this.revampedCPEUtil = new CPEUtil("revamped.server.conf");
-			this.revampedCPEUtil = revampedCPEUtil;
-			loadBatchSetConfig();
-			loadClassIndexMap();
-		} catch (ICRISException e) {
-			if (e.exceptionCode.equals(ICRISException.ExceptionCodeValue.CPE_USNAME_PASSWORD_INVALID)) {
-				log.error(e.getMessage());				
-			} else if (e.exceptionCode.equals(ICRISException.ExceptionCodeValue.CPE_URI_INVALID)) {
-				log.error(e.getMessage());				
-			} else if (e.exceptionCode.equals(ICRISException.ExceptionCodeValue.CPE_INVALID_OS_NAME)) {
-				log.error(e.getMessage());				
-			} else if (e.exceptionCode.equals(com.icris.util.ICRISException.ExceptionCodeValue.BM_LOAD_BATCH_SET_CONFIG_ERROR)) {
-				log.error(e.getMessage());
-			}
-		} catch (Exception e) {
-			log.error("unhandled CPEUtil Exception");
-			log.error(e.toString());
-		}
+
+		java.util.Properties props = new java.util.Properties();
+		props.load(new FileInputStream("config/replicateConfig/" + this.batchSetId + ".conf"));
+		this.docidSymbolicName = props.getProperty("docidSymbolicName");
+		this.revampedCPEUtil = revampedCPEUtil;
+		loadBatchSetConfig();
+		loadClassIndexMap();
+
 	}
 	
 	public void startBatchSet() {
@@ -147,12 +132,12 @@ public class ReplicateManager implements Runnable {
 				if (numOfDocReplicated==0) {
 					firstDocNumberReplicated = doc.getProperties().getFloat64Value("F_DOCNUMBER");
 				}
-				if (replicateDoc(doc) == ICRISException.ExceptionCodeValue.RPL_WORM_CLASS_NOT_FOUND) {
-					log.error(String.format("Class %s_WORM not found . ,%010.0f, %s/%s",doc.getClassName(), lastDocNumberRelicated,batchSetId,datFileName));
-				} else {
-//				retries = 0;
+
+				if (replicateDoc(doc)) {
 					numOfDocReplicated++;
 				}
+
+
 			}
 			reader.close();
 			if (isOverdue) {
@@ -161,33 +146,26 @@ public class ReplicateManager implements Runnable {
 				log.info(String.format("finished,%s/%s,%010.0f,%010.0f,%d",batchSetId,datFileName,firstDocNumberReplicated,lastDocNumberRelicated,numOfDocReplicated));
 			}			
 			
-		}  catch (IOException e) {
+		} catch (IOException e) {
 			log.error(String.format("%s,%s/%s",e.getMessage(), batchSetId,datFileName));
 			e.printStackTrace();
-		} catch (EngineRuntimeException e) {
-			log.error(String.format("%s,%010.0f, %s/%s",e.getMessage(), lastDocNumberRelicated,batchSetId,datFileName));
-			e.printStackTrace();
-		} catch (Exception e) {
-			log.error(String.format("%s,%s/%s",e.getMessage(), batchSetId,datFileName));
-			e.printStackTrace();
-		}
+		} 
 	}
 	
 	public void waitToStart() {
-		log.info(String.format("waiting,%s/%s,%s",batchSetId,datFileName,batchStartTime.toLocaleString()));
-//		log.info( batchSetId+"/"+ datFileName +" Wait to start ... until ... " + batchStartTime.toLocaleString());
-		try {
-			Date curDate = new Date();
-			TimeUnit.MILLISECONDS.sleep(this.batchStartTime.getTime() - curDate.getTime());
-		} catch (InterruptedException e) {
-		
+	log.info(String.format("waiting,%s/%s,%s",batchSetId,datFileName,batchStartTime.toLocaleString()));
+	try {
+		Date curDate = new Date();
+		TimeUnit.MILLISECONDS.sleep(this.batchStartTime.getTime() - curDate.getTime());
+	} catch (InterruptedException e) {	
+		log.info(String.format("interrupted ,%s/%s",batchSetId,datFileName));
 	}
 }
 	
 	
-	public void examineBulkMoveSweepJobResult() {
-
-	}
+//	public void examineBulkMoveSweepJobResult() {
+//
+//	}
 
 	private void loadBatchSetConfig() throws ICRISException {
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
@@ -206,38 +184,37 @@ public class ReplicateManager implements Runnable {
 		}
 	}
 	
-	private ICRISException.ExceptionCodeValue replicateDoc(Document doc) throws  IOException {
-		Document  copyDoc;
+	private Boolean replicateDoc(Document doc) {
+		Document  copyDoc = null;
 		String batchID;
-		doc.fetchProperties(new String[]{"Id","BatchID", "StorageAreaFlag", "MimeType","ContentElements","RetrievalName","ContentType","F_DOCCLASSNUMBER","F_DOCNUMBER"});
+		doc.fetchProperties(new String[]{"Id","BatchID", "StorageAreaFlag", "MimeType","ContentElements","RetrievalName","ContentType"});
 		doc.fetchProperties(isSystemProperties);
 		String fileName = doc.getProperties().getStringValue("DocumentTitle");
+		batchID = doc.getProperties().getStringValue("BatchID");
 
-		try {
-			batchID = doc.getProperties().getStringValue("BatchID");
-		} catch (EngineRuntimeException e) {
-			if (e.getExceptionCode().equals(ExceptionCode.API_PROPERTY_NOT_IN_CACHE)) {
-				batchID=null;
-			} else {
-				throw(e);
+		/*
+		 * 
+		 * if (BatchID == 0) => There is no WORM copy yet => create a now document object in WORM and copy the content elements from SAN copy to WORM copy
+		 * 
+		 * if (BatchID !=0) => There is already a WORM copy => use Batch ID to retrieve the WORM copy
+		 * 
+		 */
+		if (batchID==null){
+			try { 
+			copyDoc= Factory.Document.createInstance(revampedCPEUtil.getObjectStore(), doc.getClassName() + "_WORM");
+			copyDoc.set_MimeType(doc.get_MimeType());
+			copyDoc.getProperties().putValue("DocumentTitle", fileName);
+			copyDoc.getProperties().putValue("StorageAreaFlag", "0");
+			copyDoc.save(RefreshMode.REFRESH);
+			}  catch (EngineRuntimeException e) {
+				if (e.getExceptionCode().equals(ExceptionCode.E_BAD_CLASSID)){
+					log.error(String.format("Class %s_WORM not found  : %s, %10.0f, %s/%s",doc.getClassName(),doc.getProperties().getFloat64Value("F_DOCNUMBER"), this.batchSetId, this.datFileName));
+				} else {
+					log.error(String.format("%s : %s, %10.0f, %s/%s", e.getMessage(), doc.getClassName(),doc.getProperties().getFloat64Value("F_DOCNUMBER"), this.batchSetId, this.datFileName));
+				}
+				return false;
 			}
-		}
-
-		try {
-
-			/*
-			 * 
-			 * if (BatchID == 0) => There is no WORM copy yet => create a now document object in WORM and copy the content elements from SAN copy to WORM copy
-			 * 
-			 * if (BatchID !=0) => There is already a WORM copy => use Batch ID to retrieve the WORM copy
-			 * 
-			 */
-			if (batchID==null){
-				copyDoc= Factory.Document.createInstance(revampedCPEUtil.getObjectStore(), doc.getClassName() + "_WORM");
-				copyDoc.set_MimeType(doc.get_MimeType());
-				copyDoc.save(RefreshMode.REFRESH);
-				copyDoc.getProperties().putValue("DocumentTitle", fileName);
-				copyDoc.getProperties().putValue("StorageAreaFlag", "0");
+			try {
 				ContentElementList docContentList = doc.get_ContentElements();
 				ContentElementList contentList = Factory.ContentElement.createList();
 				Iterator it = docContentList.iterator();
@@ -252,17 +229,24 @@ public class ReplicateManager implements Runnable {
 				copyDoc.set_ContentElements(contentList);
 				copyDoc.checkin(AutoClassify.DO_NOT_AUTO_CLASSIFY, CheckinType.MAJOR_VERSION);
 				doc.getProperties().putValue("BatchID", copyDoc.get_Id().toString());
-				doc.getProperties().putValue("StorageAreaFlag", "0");
-			} else {
-				copyDoc = Factory.Document.fetchInstance(revampedCPEUtil.getObjectStore(), new Id(batchID),null);
-				copyDoc.fetchProperties(new String[]{"Id","BatchID", "StorageAreaFlag", "MimeType","ContentElements","RetrievalName","RetrievalName","ContentType","F_DOCCLASSNUMBER","F_DOCNUMBER"});
-				copyDoc.fetchProperties(isSystemProperties);
+				doc.getProperties().putValue("StorageAreaFlag", "0");				
+			} catch (EngineRuntimeException e) {
+				log.error(String.format("%s : %s, %10.0f, %s/%s", e.getMessage(), doc.getClassName(),doc.getProperties().getFloat64Value("F_DOCNUMBER"), this.batchSetId, this.datFileName));
+				copyDoc.delete();
+				copyDoc.save(RefreshMode.NO_REFRESH);
+				return false;
+			}
+		} else {
+			copyDoc = Factory.Document.fetchInstance(revampedCPEUtil.getObjectStore(), new Id(batchID),null);
+			copyDoc.fetchProperties(new String[]{"Id","BatchID", "StorageAreaFlag", "MimeType","ContentElements","RetrievalName","RetrievalName","ContentType","F_DOCCLASSNUMBER","F_DOCNUMBER"});
+			copyDoc.fetchProperties(isSystemProperties);
 
-				/*
-				 * 
-				 * Clean up the annotations in WORM copy
-				 * 
-				 */
+			/*
+			 * 
+			 * Clean up the annotations in WORM copy
+			 * 
+			 */
+			try {
 				AnnotationSet annos = copyDoc.get_Annotations();
 				Iterator iter = annos.iterator();
 				while (iter.hasNext()) {
@@ -270,15 +254,19 @@ public class ReplicateManager implements Runnable {
 					anno.delete();
 					anno.save(RefreshMode.NO_REFRESH);
 				}
-			}
-	
-			
-			/*
-			 * 
-			 * copy document properties from SAN copy to WORM copy
-			 * 
-			 * 
-			 */
+			} catch (EngineRuntimeException e) {
+				log.error(String.format("%s : %s, %10.0f, %s/%s", e.getMessage(), doc.getClassName(),doc.getProperties().getFloat64Value("F_DOCNUMBER"), this.batchSetId, this.datFileName));
+				return false;
+			} 
+		}
+		
+		/*
+		 * 
+		 * copy document properties from SAN copy to WORM copy
+		 * 
+		 * 
+		 */
+		try {
 			ArrayList<String> indexes = classIndexMap.get(doc.getProperties().getInteger32Value("F_DOCCLASSNUMBER"));
 			doc.fetchProperties(indexes.toArray(new String[0]));
 			for(String indexSymbolicName : indexes){
@@ -327,12 +315,18 @@ public class ReplicateManager implements Runnable {
 				originalAnno.save(RefreshMode.REFRESH);
 				
 			}
-			replicateOutputDataFile.write(String.format("%s,%s,%010.0f,%s/%s\n", doc.get_Id().toString(), copyDoc.get_Id().toString(),doc.getProperties().getObjectValue("F_DOCNUMBER"), batchSetId,datFileName).getBytes());
-			replicateOutputDataFile.flush();
-		} catch (EngineRuntimeException e) {
-			return ICRISException.ExceptionCodeValue.RPL_WORM_CLASS_NOT_FOUND;
+		}  catch (EngineRuntimeException e) {
+			log.error(String.format("%s : %s, %10.0f, %s/%s", e.getMessage(), doc.getClassName(),doc.getProperties().getFloat64Value("F_DOCNUMBER"), this.batchSetId, this.datFileName));
+			return false;
 		}
-		return null;
+		
+		try {
+			replicateOutputDataFile.write(String.format("%s,%s,%010.0f,%s/%s\n", doc.get_Id().toString(), copyDoc.get_Id().toString(),doc.getProperties().getFloat64Value("F_DOCNUMBER"), batchSetId,datFileName).getBytes());
+			replicateOutputDataFile.flush();
+		} catch (IOException e) {
+			log.error(String.format("%s,%s/%s",e.getMessage(), batchSetId,datFileName));
+		}
+		return true;
 	}
 	
 	private InputStream updateAnnotGUID(InputStream is, String targetId) {

@@ -8,6 +8,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.text.SimpleDateFormat;
@@ -19,6 +27,7 @@ import com.filenet.api.query.SearchSQL;
 import com.filenet.api.query.SearchScope;
 import com.filenet.api.core.Document;
 import com.filenet.api.core.ContentElement;
+import com.filenet.api.core.ContentTransfer;
 import com.filenet.api.core.Annotation;
 import com.filenet.api.property.*;
 import com.filenet.api.collection.*;
@@ -48,6 +57,10 @@ public class VerifyMigrationDocs {
 	static private CSVParser csvParser = new CSVParser();
 	static private HashMap<Integer, ArrayList<String>> classIndexMap = new HashMap<Integer, ArrayList<String>>();
 	static private HashMap<Integer, String> classNumToSymNameMap = new HashMap<Integer, String>();
+	static FileOutputStream invalidAnnotSizeReport_A, invalidAnnotSizeReport_O;
+	static Double widthThreshold = 0.0;
+	static Double heigthThreshold = 0.0;
+	static String unmatchedIndexInfo;
 //	static private String[] classSymNameArray = {"","","","","",""};
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -56,11 +69,13 @@ public class VerifyMigrationDocs {
 			String docidSetFilePath = "." + File.separator + "data" + File.separator + "docidSetOutput" + File.separator + docidSetId +".dat";
 			BufferedReader br = new BufferedReader(new FileReader(new File(docidSetFilePath)));
 			String line;
+			log.info(String.format("Start verifying ... %s", docidSetId));
 			while ((line=br.readLine())!=null) {
 				IndexAnnotationRecord indexAnnotRec = parseIndexAnnotationRecord(line);
 				if (indexAnnotRec==null) continue;
 				verifyIndexAnnotation(indexAnnotRec);			
 			}
+			log.info(String.format("End verifying ... %s", docidSetId));
 			verifiedSuccesOutputDataFile.close();
 			verifiedFailedOutputDataFile.close();
 		} catch (IOException e) {
@@ -74,6 +89,14 @@ public class VerifyMigrationDocs {
 			docidSetId = args[0];
 		} else {
 			docidSetId = "docidSet001";
+		}
+		
+		if (args.length > 1) {
+			widthThreshold = Double.valueOf(args[1]);
+			heigthThreshold = Double.valueOf(args[2]);
+		} else {
+			widthThreshold = 0.1;
+			heigthThreshold = 0.1;
 		}
 		classNumToSymNameMap.put(1, "ICRIS_Pend_Doc");
 		classNumToSymNameMap.put(2, "ICRIS_Reg_Doc");
@@ -92,6 +115,12 @@ public class VerifyMigrationDocs {
 			Files.deleteIfExists(Paths.get(verifiedFailedOutputFilePath));
 			verifiedFailedOutputDataFile = new FileOutputStream(verifiedFailedOutputFilePath);
 			loadClassIndexMap();
+			String invalidAnnotSizeReportFilePath_A = "." + File.separator + "logs" + File.separator + "invalidAnnotSizeReports" + File.separator + "invalidAnnotSize_" + docidSetId +"_A.dat";
+			Files.deleteIfExists(Paths.get(invalidAnnotSizeReportFilePath_A));
+			invalidAnnotSizeReport_A = new FileOutputStream(invalidAnnotSizeReportFilePath_A);
+			String invalidAnnotSizeReportFilePath_O = "." + File.separator + "logs" + File.separator + "invalidAnnotSizeReports" + File.separator + "invalidAnnotSize_" + docidSetId +"_O.dat";
+			Files.deleteIfExists(Paths.get(invalidAnnotSizeReportFilePath_O));
+			invalidAnnotSizeReport_O = new FileOutputStream(invalidAnnotSizeReportFilePath_O);
 		} catch (ICRISException e) {
 			if (e.exceptionCode.equals(ICRISException.ExceptionCodeValue.CPE_CONFIG_FILE_NOT_FOUND)) {
 				log.error(e.getMessage());				
@@ -104,8 +133,6 @@ public class VerifyMigrationDocs {
 			log.error("unhandled Exception");
 			log.error(e.toString());
 		}
-		
-
 	}	
 	static private void verifyIndexAnnotation(IndexAnnotationRecord indexAnnotRec) throws Exception {
 		Boolean result = true;
@@ -118,7 +145,7 @@ public class VerifyMigrationDocs {
 			
 			if (!verifyIndex(doc, classNumToSymNameMap.get(indexAnnotRec.classnum) , indexAnnotRec.indexArray)){
 				result = false;
-				errMsg = String.format("%s index not matched;", errMsg);
+				errMsg = String.format("%s index not matched %s;", errMsg, unmatchedIndexInfo);
 			}
 			
 			if (!verifyAnnotation(doc, classNumToSymNameMap.get(indexAnnotRec.classnum), indexAnnotRec.annotCount)) {
@@ -129,6 +156,12 @@ public class VerifyMigrationDocs {
 			if (!verifyPagesCount(doc, classNumToSymNameMap.get(indexAnnotRec.classnum), indexAnnotRec.pageCount)) {
 				result = false;
 				errMsg = String.format("%s pages count not matched;", errMsg);
+			}
+			
+			AnnotationSet annotSet = doc.get_Annotations();
+			Iterator annotIt =  doc.get_Annotations().iterator();
+			while (annotIt.hasNext()) {
+				validateAnnotSize((Annotation) annotIt.next());
 			}
 		}
 		if (result) {
@@ -141,6 +174,7 @@ public class VerifyMigrationDocs {
 	
 	static private Boolean verifyIndex(Document doc, String classSymName , HashMap<String, String> indexArray) {
 //		System.out.println("===================================");
+		unmatchedIndexInfo="";
 		Boolean result = true;
 		doc.fetchProperties(indexArray.keySet().toArray(new String[0]));
 		doc.fetchProperties(new String[] {"Id"});
@@ -165,15 +199,28 @@ public class VerifyMigrationDocs {
 				case "TMPLT_ID":
 					if (!"".equals(indexArray.get(indexName)) && !indexArray.get(indexName).equals(properties.getStringValue(indexName))) {
 						result = false;
+						String sTemp = properties.getStringValue(indexName);
+						if (sTemp!=null)
+							unmatchedIndexInfo = String.format("%s/%s/%s", indexName, indexArray.get(indexName), sTemp);
+						else
+							unmatchedIndexInfo = String.format("%s/%s/<NULL>", indexName, indexArray.get(indexName));
+						System.out.println("....." + unmatchedIndexInfo);
 					}
 					break;
 				case "FLING_DATE":
 				case "FNP_ARCHIVE":
 					if (!"".equals(indexArray.get(indexName)) && !compareDate(indexArray.get(indexName),properties.getDateTimeValue(indexName))) {
 						result = false;
+						Date dtTemp = properties.getDateTimeValue(indexName);
+						if (dtTemp!=null)
+							unmatchedIndexInfo = String.format("%s/%s/%s", indexName, indexArray.get(indexName), sdf.format(dtTemp));
+						else 
+							unmatchedIndexInfo = String.format("%s/%s/<NULL>", indexName, indexArray.get(indexName));
+						System.out.println("....." + unmatchedIndexInfo);
 					}
 					break;
-				default:						
+				default:
+					break;
 			}
 			if (!result) break;
 		}
@@ -292,6 +339,36 @@ public class VerifyMigrationDocs {
 				annotCounts.put(Integer.parseInt(strAnnotCount[0]), Integer.parseInt(strAnnotCount[1]));
 		}
 		return annotCounts;
+	}
+	
+	static private void validateAnnotSize(Annotation annot) throws Exception{
+		annot.fetchProperties(new String[] {"Id", "AnnotatedObject","ContentElements"});
+//		Integer annotUpdateSeq = annot.getUpdateSequenceNumber();
+		Document annotatedDoc = (Document)annot.get_AnnotatedObject();
+		annotatedDoc.fetchProperties(new String[] {"Id","F_DOCNUMBER"});
+		ContentElementList cel = annot.get_ContentElements();
+		Iterator celIt = cel.iterator();
+		while(celIt.hasNext()) {
+			ContentTransfer ct = (ContentTransfer)celIt.next();
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			org.w3c.dom.Document domDoc = dBuilder.parse(ct.accessContentStream());
+			NodeList classNodeList = domDoc.getElementsByTagName("PropDesc");
+			Node nNode = classNodeList.item(0);
+			NamedNodeMap nodeMap = nNode.getAttributes();
+			Double width = Double.valueOf(nodeMap.getNamedItem("F_WIDTH").getNodeValue());
+			Double heigth = Double.valueOf(nodeMap.getNamedItem("F_HEIGHT").getNodeValue());
+			String annotClassName = nodeMap.getNamedItem("F_CLASSNAME").getNodeValue();
+			String annotPageNum = nodeMap.getNamedItem("F_PAGENUMBER").getNodeValue();
+//			log.info(String.format("%010.0f, %f, %f", annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"), width,heigth ));
+			if (width < widthThreshold && heigth < heigthThreshold) {
+			invalidAnnotSizeReport_A.write(String.format("%010.0f, %s, %s,%s,%f,%f\n",annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"), annot.get_Id().toString(), annotClassName, annotPageNum,  width, heigth).getBytes());
+			}
+
+			if (width < widthThreshold || heigth < heigthThreshold) {
+			invalidAnnotSizeReport_O.write(String.format("%010.0f, %s, %s,%s,%f,%f\n",annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"), annot.get_Id().toString(), annotClassName, annotPageNum,  width, heigth).getBytes());        				
+    		}
+		}		
 	}
 
 }

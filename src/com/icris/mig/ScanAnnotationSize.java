@@ -107,6 +107,7 @@ public class ScanAnnotationSize {
 	        			Double heigth = Double.valueOf(nodeMap.getNamedItem("F_HEIGHT").getNodeValue());
 	        			String annotClassName = nodeMap.getNamedItem("F_CLASSNAME").getNodeValue();
 	        			String annotPageNum = nodeMap.getNamedItem("F_PAGENUMBER").getNodeValue();
+//	        			System.out.println(String.format("%010.0f, %s, %s,%s,%f,%f\n",annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"), annot.get_Id().toString(), annotClassName, annotPageNum,  width, heigth));
 	        			if (isAND) {
 		        			if (width < widthThreshold && heigth < heigthThreshold) {
 	//	        			System.out.println(String.format("%010.0f, %s, %s, %d, %f, %f",annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"),annotClassName, annotPageNum, annotUpdateSeq, width, heigth));
@@ -136,7 +137,7 @@ public class ScanAnnotationSize {
 	}
 	
 	private static void initialize(String[] args) throws Exception {
-		log = new ICRISLogger("annotScan" + simpleDateFormat.format(curDate),"invalidAnnotSizeReports");
+//		log = new ICRISLogger("annotScan" + simpleDateFormat.format(curDate),"invalidAnnotSizeReports");
 		revampedCPEUtil = new CPEUtil("revamped.server.conf", log);
 		objectStore = revampedCPEUtil.getObjectStore();
 //		annotSizeThreshold = Double.valueOf(args[0]);
@@ -144,21 +145,20 @@ public class ScanAnnotationSize {
 		heigthThreshold = Double.valueOf(args[1]);
 //		String invalidAnnotSizeReportFilePath = "." + File.separator + "logs" + File.separator + "invalidAnnotSizeReports" + File.separator + "invalidAnnotSize_" +simpleDateFormat.format(curDate) +"_A.dat";
 
-
+		String invalidAnnotSizeReportFilePath_A = "." + File.separator + "logs" + File.separator + "invalidAnnotSizeReports" + File.separator + "invalidAnnotSize_" +simpleDateFormat.format(curDate) +"_A.dat";
+		Files.deleteIfExists(Paths.get(invalidAnnotSizeReportFilePath_A));
+		invalidAnnotSizeReport_A = new FileOutputStream(invalidAnnotSizeReportFilePath_A);
+		String invalidAnnotSizeReportFilePath_O = "." + File.separator + "logs" + File.separator + "invalidAnnotSizeReports" + File.separator + "invalidAnnotSize_" +simpleDateFormat.format(curDate) +"_O.dat";
+		Files.deleteIfExists(Paths.get(invalidAnnotSizeReportFilePath_O));
+		invalidAnnotSizeReport_O = new FileOutputStream(invalidAnnotSizeReportFilePath_O);
 		if (args.length > 2) {
 			if (args[2].equals("-A")) {
 				isAND = true;
 				isOR = false;
-				String invalidAnnotSizeReportFilePath_A = "." + File.separator + "logs" + File.separator + "invalidAnnotSizeReports" + File.separator + "invalidAnnotSize_" +simpleDateFormat.format(curDate) +"_A.dat";
-				Files.deleteIfExists(Paths.get(invalidAnnotSizeReportFilePath_A));
-				invalidAnnotSizeReport_A = new FileOutputStream(invalidAnnotSizeReportFilePath_A);
 			} 
 			if (args[2].equals("-O")) {
 				isOR = true;
 				isOR = false;
-				String invalidAnnotSizeReportFilePath_O = "." + File.separator + "logs" + File.separator + "invalidAnnotSizeReports" + File.separator + "invalidAnnotSize_" +simpleDateFormat.format(curDate) +"_O.dat";
-				Files.deleteIfExists(Paths.get(invalidAnnotSizeReportFilePath_O));
-				invalidAnnotSizeReport_O = new FileOutputStream(invalidAnnotSizeReportFilePath_O);
 			} 
 		} else {
 			isAND = true;

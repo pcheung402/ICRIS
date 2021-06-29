@@ -21,7 +21,7 @@ import com.filenet.api.util.UserContext;
 public class ReplicateToWORM {
 	static String batchSetId;
 	static ICRISLogger log;
-	static ReplicateManager bmManager;
+//	static ReplicateManager bmManager;
 	static CPEUtil revampedCPEUtil;
 	static FileOutputStream replicateOutputDataFile;
 	static Boolean isByDocid = false;
@@ -33,7 +33,22 @@ public class ReplicateToWORM {
 		File[] listOfFiles = folder.listFiles();
 		log.info(String.format("Start submiiting %d  batches", listOfFiles.length));
 		for (File fd : listOfFiles) {
-			es.execute(new ReplicateManager(batchSetId, fd.getName(), log, replicateOutputDataFile, revampedCPEUtil, isByDocid));
+			try {
+				ReplicateManager replicationManager = new ReplicateManager(batchSetId, fd.getName(), log, replicateOutputDataFile, revampedCPEUtil, isByDocid);
+				es.execute(replicationManager);
+			} catch (ICRISException e) {
+				if (e.exceptionCode.equals(ICRISException.ExceptionCodeValue.CPE_USNAME_PASSWORD_INVALID)) {
+					log.error(e.getMessage());				
+				} else if (e.exceptionCode.equals(ICRISException.ExceptionCodeValue.CPE_URI_INVALID)) {
+					log.error(e.getMessage());				
+				} else if (e.exceptionCode.equals(ICRISException.ExceptionCodeValue.CPE_INVALID_OS_NAME)) {
+					log.error(e.getMessage());				
+				} else if (e.exceptionCode.equals(com.icris.util.ICRISException.ExceptionCodeValue.BM_LOAD_BATCH_SET_CONFIG_ERROR)) {
+					log.error(e.getMessage());
+				}
+			} catch (IOException e) {
+				log.error(e.getMessage());
+			}
 		}		
 		es.shutdown();
 		try {

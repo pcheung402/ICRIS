@@ -125,9 +125,9 @@ public class CPEUtil {
 		} catch (FileNotFoundException e) {
 			throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_CONFIG_FILE_NOT_FOUND, "File " + CONF_FILE_DIR + " not found", e);
 		} catch (IOException e) {
-			throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_CONFIG_FILE_CANNOT_BE_OPENED, "Error in opening/reading server.conf.properties file", e);
+			throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_CONFIG_FILE_CANNOT_BE_OPENED, "Error in opening/reading" + configFile + " file", e);
 		} catch (IllegalArgumentException e) {
-			throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_CONFIG_FILE_ILLEGAL_ARGUMENT, "Illegal argument in server.conf.properties", e);
+			throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_CONFIG_FILE_ILLEGAL_ARGUMENT, "Illegal argument in " + configFile, e);
 		} catch (EngineRuntimeException e) {
 			if (e.getExceptionCode().equals(ExceptionCode.E_NOT_AUTHENTICATED)) {
 				throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_USNAME_PASSWORD_INVALID, "userName or password is invalid", e);				
