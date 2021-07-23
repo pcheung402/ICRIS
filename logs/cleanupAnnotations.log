@@ -1,0 +1,36 @@
+2021-05-14 11:20:26,449  INFO [main] - Start cleanup annotation of documents ...
+2021-05-14 11:20:26,488  INFO [main] - Total 0 annotation(s) removed from document 101000
+2021-05-14 11:20:26,506  INFO [main] - Total 0 annotation(s) removed from document 101001
+2021-05-14 11:20:26,525  INFO [main] - Total 0 annotation(s) removed from document 101002
+2021-05-14 11:20:26,525  INFO [main] - End cleanup annotation of documents ...
+2021-05-14 11:21:33,867  INFO [main] - Start cleanup annotation of documents ...
+2021-05-14 11:21:34,082  INFO [main] - Total 3 annotation(s) removed from document 101000
+2021-05-14 11:21:34,104  INFO [main] - Total 0 annotation(s) removed from document 101001
+2021-05-14 11:21:34,123  INFO [main] - Total 0 annotation(s) removed from document 101002
+2021-05-14 11:21:34,123  INFO [main] - End cleanup annotation of documents ...
+2021-05-14 15:05:59,791  INFO [main] - Start cleanup annotation of documents ...
+2021-05-14 15:05:59,907  INFO [main] - Total 3 annotation(s) removed from document 101000
+2021-05-14 15:05:59,945  INFO [main] - Total 0 annotation(s) removed from document 101001
+2021-05-14 15:05:59,963  INFO [main] - Total 0 annotation(s) removed from document 101002
+2021-05-14 15:05:59,981  INFO [main] - Total 0 annotation(s) removed from document 101003
+2021-05-14 15:05:59,998  INFO [main] - Total 0 annotation(s) removed from document 101004
+2021-05-14 15:06:00,015  INFO [main] - Total 0 annotation(s) removed from document 101005
+2021-05-14 15:06:00,033  INFO [main] - Total 0 annotation(s) removed from document 101006
+2021-05-14 15:06:00,051  INFO [main] - Total 0 annotation(s) removed from document 101007
+2021-05-14 15:06:00,071  INFO [main] - Total 0 annotation(s) removed from document 101008
+2021-05-14 15:06:00,154  INFO [main] - Total 3 annotation(s) removed from document 101009
+2021-05-14 15:06:00,170  INFO [main] - Total 0 annotation(s) removed from document 101010
+2021-05-14 15:06:00,170  INFO [main] - End cleanup annotation of documents ...
+2021-05-14 15:06:53,436  INFO [main] - Start cleanup annotation of documents ...
+2021-05-14 15:06:53,492  INFO [main] - Total 0 annotation(s) removed from document 101000
+2021-05-14 15:06:53,510  INFO [main] - Total 0 annotation(s) removed from document 101001
+2021-05-14 15:06:53,527  INFO [main] - Total 0 annotation(s) removed from document 101002
+2021-05-14 15:06:53,548  INFO [main] - Total 0 annotation(s) removed from document 101003
+2021-05-14 15:06:53,567  INFO [main] - Total 0 annotation(s) removed from document 101004
+2021-05-14 15:06:53,585  INFO [main] - Total 0 annotation(s) removed from document 101005
+2021-05-14 15:06:53,603  INFO [main] - Total 0 annotation(s) removed from document 101006
+2021-05-14 15:06:53,620  INFO [main] - Total 0 annotation(s) removed from document 101007
+2021-05-14 15:06:53,639  INFO [main] - Total 0 annotation(s) removed from document 101008
+2021-05-14 15:06:53,657  INFO [main] - Total 0 annotation(s) removed from document 101009
+2021-05-14 15:06:53,675  INFO [main] - Total 0 annotation(s) removed from document 101010
+2021-05-14 15:06:53,675  INFO [main] - End cleanup annotation of documents ...

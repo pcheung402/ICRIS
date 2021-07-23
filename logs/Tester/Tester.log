@@ -1,0 +1,11 @@
+2020-12-22 12:50:00,620 ERROR [main] - unhandled CPEUtil Exception
+2020-12-22 12:50:00,652 ERROR [main] - com.filenet.api.exception.EngineRuntimeException: FNRCA0031E: API_UNABLE_TO_USE_CONNECTION: The URI for server communication cannot be determined from the connection object http://192.168.93.65:9080/wsi/FNCEWS40MTOM. Message was: No route to host: connect
+2021-03-22 14:02:49,286  INFO [main] - Connected to : ICM532;OS
+2021-05-14 09:27:28,595 ERROR [main] - unhandled CPEUtil Exception
+2021-05-14 09:27:28,618 ERROR [main] - com.filenet.api.exception.EngineRuntimeException: FNRCA0031E: API_UNABLE_TO_USE_CONNECTION: The URI for server communication cannot be determined from the connection object http://192.168.217.98:9081/wsi/FNCEWS40MTOM. Message was: Connection timed out: connect
+2021-05-14 09:30:22,184  INFO [main] - Connected to : ICM532;OS
+2021-05-14 10:25:43,593  INFO [main] - Connected to : ICM532;OS
+2021-07-21 14:07:07,465 ERROR [main] - userName or password is invalid
+2021-07-21 14:08:11,671 ERROR [main] - userName or password is invalid
+2021-07-21 14:14:48,813 ERROR [main] - userName or password is invalid
+2021-07-21 14:15:21,020  INFO [main] - Connected to : ICM533;OS
