@@ -46,6 +46,7 @@ import com.filenet.api.query.SearchScope;
 import com.filenet.api.util.*;
 import com.filenet.apiimpl.constants.Constants;
 import com.filenet.api.collection.*;
+import com.filenet.api.constants.RetentionConstants;
 
 import com.icris.util.*;
 
@@ -205,6 +206,7 @@ public class ReplicateManager implements Runnable {
 			copyDoc.set_MimeType(doc.get_MimeType());
 			copyDoc.getProperties().putValue("DocumentTitle", fileName);
 			copyDoc.getProperties().putValue("StorageAreaFlag", "0");
+			copyDoc.set_CmRetentionDate(RetentionConstants.PERMANENT);
 			copyDoc.save(RefreshMode.REFRESH);
 			}  catch (EngineRuntimeException e) {
 				if (e.getExceptionCode().equals(ExceptionCode.E_BAD_CLASSID)){

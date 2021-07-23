@@ -59,6 +59,7 @@ public class CPEUtil {
 			String protocol = props.getProperty("Protocol", "http");
 			String uri = protocol + "://" + props.getProperty(CPEServer)+":" +props.getProperty(CPEPort) +"/wsi/FNCEWS40MTOM";
 			System.out.println(uri);
+//			System.out.println(userName + "/" + password);
 	        con = Factory.Connection.getConnection(uri);
 	        this.sub = UserContext.createSubject(con,userName,password,"FileNetP8");
 	        UserContext.get().pushSubject(this.sub);
