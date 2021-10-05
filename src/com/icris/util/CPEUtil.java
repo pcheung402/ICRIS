@@ -173,14 +173,14 @@ public class CPEUtil {
 
 	public Boolean moveContent(Document doc) throws EngineRuntimeException, ICRISException {
 		try {
-			this.sa.fetchProperties(new String[] {"Id"});
+			this.sa.fetchProperties(new String[] {"Id","DisplayName"});
 			doc.moveContent(this.sa);
 			doc.save(RefreshMode.NO_REFRESH);
 			return Boolean.TRUE;
 		} catch (EngineRuntimeException e) {
 			if (e.getExceptionCode().equals(ExceptionCode.CONTENT_FCA_SAVE_FAILED)) {
 				log.info("CONTENT_FCA_SAVE_FAILED" + "," + this.sa.get_DisplayName());
-				getNextStorageArea();;
+				getNextStorageArea();
 				doc.refresh(new String[] {"StorageArea", "NAME"});
 				return Boolean.FALSE; /* content move fail, retry, switch to next storage area and retry */
 			}

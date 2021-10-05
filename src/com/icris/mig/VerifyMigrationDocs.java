@@ -2,15 +2,20 @@ package com.icris.mig;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.xml.sax.SAXParseException;
+
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -352,22 +357,34 @@ public class VerifyMigrationDocs {
 			ContentTransfer ct = (ContentTransfer)celIt.next();
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			org.w3c.dom.Document domDoc = dBuilder.parse(ct.accessContentStream());
-			NodeList classNodeList = domDoc.getElementsByTagName("PropDesc");
-			Node nNode = classNodeList.item(0);
-			NamedNodeMap nodeMap = nNode.getAttributes();
-			Double width = Double.valueOf(nodeMap.getNamedItem("F_WIDTH").getNodeValue());
-			Double heigth = Double.valueOf(nodeMap.getNamedItem("F_HEIGHT").getNodeValue());
-			String annotClassName = nodeMap.getNamedItem("F_CLASSNAME").getNodeValue();
-			String annotPageNum = nodeMap.getNamedItem("F_PAGENUMBER").getNodeValue();
-//			log.info(String.format("%010.0f, %f, %f", annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"), width,heigth ));
-			if (width < widthThreshold && heigth < heigthThreshold) {
-			invalidAnnotSizeReport_A.write(String.format("%010.0f, %s, %s,%s,%f,%f\n",annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"), annot.get_Id().toString(), annotClassName, annotPageNum,  width, heigth).getBytes());
+			try {
+				org.w3c.dom.Document domDoc = dBuilder.parse(ct.accessContentStream());
+	
+				NodeList classNodeList = domDoc.getElementsByTagName("PropDesc");
+				Node nNode = classNodeList.item(0);
+				NamedNodeMap nodeMap = nNode.getAttributes();
+				Double width = Double.valueOf(nodeMap.getNamedItem("F_WIDTH").getNodeValue());
+				Double heigth = Double.valueOf(nodeMap.getNamedItem("F_HEIGHT").getNodeValue());
+				String annotClassName = nodeMap.getNamedItem("F_CLASSNAME").getNodeValue();
+				String annotPageNum = nodeMap.getNamedItem("F_PAGENUMBER").getNodeValue();
+	
+	//			log.info(String.format("%010.0f, %f, %f", annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"), width,heigth ));
+				if (width < widthThreshold && heigth < heigthThreshold) {
+				invalidAnnotSizeReport_A.write(String.format("%010.0f, %s, %s,%s,%f,%f\n",annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"), annot.get_Id().toString(), annotClassName, annotPageNum,  width, heigth).getBytes());
+				}
+	
+				if (width < widthThreshold || heigth < heigthThreshold) {
+				invalidAnnotSizeReport_O.write(String.format("%010.0f, %s, %s,%s,%f,%f\n",annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"), annot.get_Id().toString(), annotClassName, annotPageNum,  width, heigth).getBytes());        				
+	    		}
+			} catch (SAXParseException e) {
+				char[] buffer = new char[1024];
+				 StringBuilder out = new StringBuilder();
+				 Reader in = new InputStreamReader(ct.accessContentStream(), StandardCharsets.UTF_8);
+				 for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
+				     out.append(buffer, 0, numRead);
+				 }
+				log.error(String.format("Anntation format error : %s, %s, %010.0f\n%s", annotatedDoc.get_Id().toString(), annot.get_Id().toString(), annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"),out.toString()));
 			}
-
-			if (width < widthThreshold || heigth < heigthThreshold) {
-			invalidAnnotSizeReport_O.write(String.format("%010.0f, %s, %s,%s,%f,%f\n",annotatedDoc.getProperties().getFloat64Value("F_DOCNUMBER"), annot.get_Id().toString(), annotClassName, annotPageNum,  width, heigth).getBytes());        				
-    		}
 		}		
 	}
 
