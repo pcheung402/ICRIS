@@ -1,5 +1,7 @@
 package com.icris.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -8,8 +10,21 @@ import java.io.FileNotFoundException;
 import java.util.*;
 import java.nio.file.Paths;
 import javax.security.auth.Subject;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.util.concurrent.*;
+
+
 import com.filenet.api.collection.*;
+import com.filenet.api.core.Annotation;
 import com.filenet.api.core.Connection;
+import com.filenet.api.core.ContentTransfer;
 import com.filenet.api.core.Domain;
 import com.filenet.api.core.Factory;
 import com.filenet.api.core.ObjectStore;
@@ -19,7 +34,7 @@ import com.filenet.api.exception.ExceptionCode;
 import com.filenet.api.util.UserContext;
 import com.filenet.api.admin.*;
 import com.filenet.api.constants.*;
-
+import com.filenet.api.replication.*;
 
 
 public class CPEUtil {
@@ -43,12 +58,20 @@ public class CPEUtil {
 	private UserContext uc;
 	private Subject sub;
 	private Integer CFS_IS_Retries;
+	private DocumentBuilderFactory factory;
+	private DocumentBuilder builder;
+	private Big5ToUTFMapper big5ToUTF16Mapper;
+	private Semaphore semFileStore;
 	
-	public CPEUtil(String configFile,ICRISLogger log) throws ICRISException{
+	public CPEUtil(String configFile,ICRISLogger log) throws ICRISException, ParserConfigurationException{
 		this.log = log;
 		CONF_FILE_DIR = "." + File.separator + "config" + File.separator + configFile;
 		System.out.println("configure file : " + CONF_FILE_DIR);
 		try {
+			semFileStore = new Semaphore(1, true);
+			factory = DocumentBuilderFactory.newInstance();
+			 builder = factory.newDocumentBuilder();
+			big5ToUTF16Mapper = new Big5ToUTFMapper("Big5-HKSCS", "UTF-16BE");
 			InputStream input = new FileInputStream(CONF_FILE_DIR);
 	        Properties props = new Properties();
 	        // load a properties file
@@ -195,44 +218,161 @@ public class CPEUtil {
 		}
 	}
 	
-	private void getNextStorageArea() throws ICRISException, ICRISException{
-		this.sa.set_ResourceStatus(ResourceStatus.FULL); /* change the current storage area to FULL */
-		this.sa.save(RefreshMode.REFRESH);
-		log.info(String.format("%s is FULL", sa.get_DisplayName()).toString());
-		Integer saPri = this.sa.get_CmStandbyActivationPriority();
-		StoragePolicy sp = getStoragePolicy();
-		StorageAreaSet sas = sp.get_StorageAreas();
-		
-		/*
-		 *  Sort all STANDBY or OPEN storage area by CmStandbyActivationPriority
-		 */
-		SortedSet<FileStorageArea> saSortedSet = new TreeSet<FileStorageArea>(new Comparator<FileStorageArea>(){
-			public int compare(FileStorageArea one, FileStorageArea another) {
-				return one.get_CmStandbyActivationPriority() - another.get_CmStandbyActivationPriority() ;
-			}
-		});
-		Iterator<FileStorageArea> itsa = sas.iterator();
-		while (itsa.hasNext()) {
-			FileStorageArea temp = itsa.next();
-			temp.fetchProperties(new String[] {"ResourceStatus"});
-			if(temp.get_ResourceStatus().equals(ResourceStatus.STANDBY)||temp.get_ResourceStatus().equals(ResourceStatus.OPEN) ) {
-				saSortedSet.add(temp);
-			}
-		}
-		
-		/*
-		 *  select the first STANDBY or OPEN storage area, if any
-		 */
-		if (!saSortedSet.isEmpty()) {
-			this.sa = saSortedSet.first();
-			this.sa.set_ResourceStatus(ResourceStatus.OPEN);
+	private void getNextStorageArea() throws ICRISException{
+		try {
+			semFileStore.acquire();
+			this.sa.set_ResourceStatus(ResourceStatus.FULL); /* change the current storage area to FULL */
 			this.sa.save(RefreshMode.REFRESH);
-			this.sa.refresh();
-			return;
-		} else {
-			this.sa = null;
-			throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_SA_UNAVAILABLE, "No more standby Storage Area available"); 
-		}	
+			log.info(String.format("%s is FULL", sa.get_DisplayName()).toString());
+			Integer saPri = this.sa.get_CmStandbyActivationPriority();
+			StoragePolicy sp = getStoragePolicy();
+			StorageAreaSet sas = sp.get_StorageAreas();
+			
+			/*
+			 *  Sort all STANDBY or OPEN storage area by CmStandbyActivationPriority
+			 */
+			SortedSet<FileStorageArea> saSortedSet = new TreeSet<FileStorageArea>(new Comparator<FileStorageArea>(){
+				public int compare(FileStorageArea one, FileStorageArea another) {
+					return one.get_CmStandbyActivationPriority() - another.get_CmStandbyActivationPriority() ;
+				}
+			});
+			Iterator<FileStorageArea> itsa = sas.iterator();
+			while (itsa.hasNext()) {
+				FileStorageArea temp = itsa.next();
+				temp.fetchProperties(new String[] {"ResourceStatus"});
+				if(temp.get_ResourceStatus().equals(ResourceStatus.STANDBY)||temp.get_ResourceStatus().equals(ResourceStatus.OPEN) ) {
+					saSortedSet.add(temp);
+				}
+			}
+			
+			/*
+			 *  select the first STANDBY or OPEN storage area, if any
+			 */
+			if (!saSortedSet.isEmpty()) {
+				this.sa = saSortedSet.first();
+				this.sa.setUpdateSequenceNumber(null);
+				this.sa.set_ResourceStatus(ResourceStatus.OPEN);
+				this.sa.save(RefreshMode.REFRESH);
+				this.sa.refresh();
+				return;
+			} else {
+				this.sa = null;
+				throw new ICRISException(ICRISException.ExceptionCodeValue.CPE_SA_UNAVAILABLE, "No more standby Storage Area available"); 
+			}	
+		} catch (IllegalArgumentException | InterruptedException e) {
+			throw new ICRISException(ICRISException.ExceptionCodeValue.BM_FILESSTORE_SEM_ARBIRATION_ERROR, "FileStore Semaphore Arbitration Error");
+		} finally {
+			semFileStore.release();
+		}
+	}
 
-	}	
+	public void updateAnnot(Document doc) {
+		ReplicationGroup rg = doc.get_ReplicationGroup();
+		try {			
+//			if(rg!=null) {
+				log.info(String.format("clear replication group of document - %s", doc.get_Name()));
+				doc.set_ReplicationGroup(null);
+				doc.save(RefreshMode.REFRESH);
+				System.out.println("clear application group");
+//			}
+			AnnotationSet annotSet = doc.get_Annotations();
+			ArrayList<Annotation> annotationSetStaging = new ArrayList<Annotation>(); 
+			Iterator<Annotation> annotIt = annotSet.iterator();
+			while(annotIt.hasNext()) {
+				Annotation annot = annotIt.next();
+				annotationSetStaging.add(annot);
+			}
+			
+			Iterator<Annotation> annotItStagging = annotationSetStaging.iterator();
+			while(annotItStagging.hasNext()) {
+				Annotation annotOrig = annotItStagging.next();
+				Annotation annotNew = Factory.Annotation.createInstance(os, "Annotation");
+				ContentElementList cel = annotOrig.get_ContentElements();
+				annotNew.set_AnnotatedObject(doc);
+				annotNew.set_AnnotatedContentElement(annotOrig.get_AnnotatedContentElement());
+				annotNew.setUpdateSequenceNumber(annotOrig.getUpdateSequenceNumber());
+				annotNew.set_Permissions(annotOrig.get_Permissions());
+				annotNew.save(RefreshMode.REFRESH);
+				String annotId = annotNew.get_Id().toString();
+//				System.out.println(annotId);
+				
+				ContentElementList celNew = Factory.ContentElement.createList();
+				Iterator<ContentTransfer> ctIt = cel.iterator();
+				while (ctIt.hasNext()) {
+					ContentTransfer ctNew = Factory.ContentTransfer.createInstance();
+					ContentTransfer ctOrig = ctIt.next();
+					InputStream is = ctOrig.accessContentStream();
+					is = updateAnnotGUID(is, annotId);
+					is = updateAnnotTEXT(is);
+					ctNew.setCaptureSource(is);
+					ctNew.set_ContentType(ctOrig.get_ContentType());
+					ctNew.set_RetrievalName(ctOrig.get_RetrievalName());
+					celNew.add(ctNew);
+				}
+				annotNew.set_ContentElements(celNew);
+				annotNew.save(RefreshMode.REFRESH);
+			}
+			
+			annotItStagging = annotationSetStaging.iterator();
+			while(annotItStagging.hasNext()) {
+				Annotation annot = annotItStagging.next();
+				annot.delete();
+				annot.save(RefreshMode.REFRESH);
+			}
+
+		
+		} catch (Exception e) {
+			log.error("unhandled CPEUtil Exception");
+			log.error(e.toString());
+			e.printStackTrace();
+		} 
+	}
+	
+	private  InputStream updateAnnotGUID(InputStream is, String targetId) {
+		try {
+			builder.reset();
+			org.w3c.dom.Document doc = builder.parse(is);
+			org.w3c.dom.Element elementPropDesc = (org.w3c.dom.Element)doc.getElementsByTagName("PropDesc").item(0);
+			elementPropDesc.setAttribute("F_ID", targetId);
+			elementPropDesc.setAttribute("F_ANNOTATEDID", targetId);
+
+			ByteArrayOutputStream oStream = new ByteArrayOutputStream();
+			Source xmlSource = new DOMSource(doc);
+			Result oTarget = new StreamResult(oStream);
+			TransformerFactory.newInstance().newTransformer().transform(xmlSource, oTarget);
+			InputStream ret = new ByteArrayInputStream(oStream.toByteArray());
+			return ret;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	private  InputStream updateAnnotTEXT(InputStream is) {
+		try {
+			builder.reset();
+			org.w3c.dom.Document doc = builder.parse(is);		
+			org.w3c.dom.Element elementTEXT = (org.w3c.dom.Element)doc.getElementsByTagName("F_TEXT").item(0);
+			
+			if(elementTEXT!=null && !"True".equals(elementTEXT.getAttribute("CONVERTED"))) {
+				String origText = elementTEXT.getTextContent();
+				elementTEXT.setTextContent(big5ToUTF16Mapper.convertFromBig5ToUTF(origText));
+				elementTEXT.setAttribute("CONVERTED", "True");
+				
+				org.w3c.dom.Element elementTEXT_ORIG = doc.createElement("F_TEXT_ORIG");
+				org.w3c.dom.Element elementPropDesc = (org.w3c.dom.Element)doc.getElementsByTagName("PropDesc").item(0);
+				elementPropDesc.appendChild(elementTEXT_ORIG);
+				elementTEXT_ORIG.setTextContent(origText);
+			}
+			ByteArrayOutputStream oStream = new ByteArrayOutputStream();
+			Source xmlSource = new DOMSource(doc);
+			Result oTarget = new StreamResult(oStream);
+			TransformerFactory.newInstance().newTransformer().transform(xmlSource, oTarget);
+			InputStream result = new ByteArrayInputStream(oStream.toByteArray());
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 }

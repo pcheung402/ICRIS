@@ -1,7 +1,7 @@
 package com.icris.util;
 
 public class ICRISException extends Exception {
-	/**
+	/*
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
@@ -21,8 +21,10 @@ public class ICRISException extends Exception {
 		BM_LOAD_BATCH_SET_CONFIG_ERROR,
 		BM_BATCH_SET_DATA_ERROR,
 		BM_BATCH_NOT_UNIQUE,
+		BM_FILESSTORE_SEM_ARBIRATION_ERROR,
 		RPL_WORM_CLASS_NOT_FOUND,
-		CB_UNABLE_TO_WRITE_BATCH_SET_DATA_FILE
+		CB_UNABLE_TO_WRITE_BATCH_SET_DATA_FILE,
+		CC_INVALIDBIG5CODE
 	};
 	
 	public ExceptionCodeValue exceptionCode;
@@ -69,7 +71,11 @@ public class ICRISException extends Exception {
 			break;
 		case BM_BATCH_NOT_UNIQUE:
 			break;
+		case BM_FILESSTORE_SEM_ARBIRATION_ERROR:
+			break;
 		case CB_UNABLE_TO_WRITE_BATCH_SET_DATA_FILE:
+			break;
+		case CC_INVALIDBIG5CODE:
 			break;
 		default:
 		}

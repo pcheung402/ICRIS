@@ -20,41 +20,55 @@ public class CSVParser {
     	String strBuffer="";
     	ArrayList<String> parsedLine = new ArrayList<String>();
     	char[] lineBytes = line.toCharArray();
-    	for (char lineByte : lineBytes){
+    	//for (char lineByte : lineBytes){
+    	for (int i=0; i<lineBytes.length; ++i) {
     		switch (lineParserState) {
     		case INIT_STATE:
-    			if (lineByte == ','){
+    			if (lineBytes[i] == ','){
     				parsedLine.add(""); 
     				lineParserState = LineParserState.INIT_STATE;
-    			} else if (lineByte == ' '){
+    			} else if (lineBytes[i] == ' '){
     				lineParserState = LineParserState.INIT_STATE;
-    			} else if (lineByte == '"'){
+    			} else if (lineBytes[i] == '"'){
     				lineParserState = LineParserState.RECEIVING_TOKEN_OPEN_DOUBLEQUOTE_RECEIVED;
     			} else {
-    				strBuffer += lineByte;
+    				strBuffer += lineBytes[i];
     				lineParserState = LineParserState.RECEIVING_TOKEN_NO_DOUBLEQUOTE_RECEIVED;
     			}
     			break;
     		case RECEIVING_TOKEN_OPEN_DOUBLEQUOTE_RECEIVED:
-    			if (lineByte == '"'){
-    				strBuffer = strBuffer.trim();
-    				parsedLine.add(strBuffer);   					
-    				strBuffer="";
-    				lineParserState = LineParserState.EXPECTING_SEPARATOR;
-    			} else {
-    				strBuffer += lineByte;
-    				lineParserState = LineParserState.RECEIVING_TOKEN_OPEN_DOUBLEQUOTE_RECEIVED;  
+    			if (lineBytes[i] == '"'){
+    				/** Handling if " inside "" */
+    				//lineParserState = LineParserState.EXPECTING_SEPARATOR;
+    				if (i+1 < lineBytes.length && lineBytes[i+1] == ',' )
+    				{
+        				strBuffer = strBuffer.trim();
+        				parsedLine.add(strBuffer);   					
+        				strBuffer="";
+        				++i;
+        				lineParserState = LineParserState.INIT_STATE;
+        				break;
+    				}
     			}
+
+    			strBuffer += lineBytes[i];
+    				//lineParserState = LineParserState.RECEIVING_TOKEN_OPEN_DOUBLEQUOTE_RECEIVED;  
+    			
     			break;
     		case EXPECTING_SEPARATOR:
-    			if (lineByte == ','){
-    				lineParserState = LineParserState.INIT_STATE; 
-    			} else {
-    				lineParserState = LineParserState.EXPECTING_SEPARATOR;
-    			}
+//    			if (lineBytes[i] == ','){
+//    				/** Handling if " inside "" */
+// 
+//    			} else {
+//    				/** Handling if " inside "" */
+//    				//strBuffer += '"';
+//    				strBuffer += lineBytes[i];
+//    				lineParserState = LineParserState.EXPECTING_SEPARATOR;
+//    			}
+//    			
     			break;
     		case RECEIVING_TOKEN_NO_DOUBLEQUOTE_RECEIVED:
-    			if (lineByte == ','){
+    			if (lineBytes[i] == ','){
     				strBuffer = strBuffer.trim();
     				if (strBuffer.length()>0){
 //    					System.out.println(lineParserState+";"+strBuffer);
@@ -63,7 +77,7 @@ public class CSVParser {
     				strBuffer="";
     				lineParserState = LineParserState.INIT_STATE; 
     			} else {
-    				strBuffer += lineByte;
+    				strBuffer += lineBytes[i];
     				lineParserState = LineParserState.RECEIVING_TOKEN_NO_DOUBLEQUOTE_RECEIVED;
     			}
     			break;

@@ -28,7 +28,7 @@
 		<property>PRT_VW_IND</property>
 		<property>PRV_DOCID</property>
 		<property>STATUS</property>
-			</docClass>
+	</docClass>
 	<docClass>
 		<parentClass>ICRIS_Barcode_Doc</parentClass>
 		<symName>ICRIS_CR_Doc</symName>

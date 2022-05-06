@@ -147,7 +147,7 @@ public class VerifyMigrationDocs {
 			result = false;
 			errMsg = String.format("%s docid not found;", errMsg);
 		} else {
-			
+			doc.fetchProperties(new String[] {"Id","abandoned"});
 			if (!verifyIndex(doc, classNumToSymNameMap.get(indexAnnotRec.classnum) , indexAnnotRec.indexArray)){
 				result = false;
 				errMsg = String.format("%s index not matched %s;", errMsg, unmatchedIndexInfo);
@@ -182,8 +182,11 @@ public class VerifyMigrationDocs {
 		unmatchedIndexInfo="";
 		Boolean result = true;
 		doc.fetchProperties(indexArray.keySet().toArray(new String[0]));
-		doc.fetchProperties(new String[] {"Id"});
+//		doc.fetchProperties(new String[] {"Id"});
 		Properties properties = doc.getProperties();
+		if (properties.getBooleanValue("abandoned")) {
+			log.info(String.format("This document, %010f.0 is previously set to abandoned in P8 but reapperaed in ICRIS IS", properties.getFloat64Value("F_DOCNUMBER")));
+		}
 		for (String indexName: indexArray.keySet()){
 			switch (indexName) {
 				case "F_DOCNUMBER":

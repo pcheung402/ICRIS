@@ -187,11 +187,16 @@ public class ReplicateManager implements Runnable {
 	
 	private Boolean replicateDoc(Document doc) {
 		Document  copyDoc = null;
-		String batchID;
+		String batchID = null;
 		doc.fetchProperties(new String[]{"Id","BatchID", "StorageAreaFlag", "MimeType","ContentElements","RetrievalName","ContentType"});
 		doc.fetchProperties(isSystemProperties);
 		String fileName = doc.getProperties().getStringValue("DocumentTitle");
-		batchID = doc.getProperties().getStringValue("BatchID");
+		try {
+			batchID = doc.getProperties().getStringValue("BatchID");
+		} catch(EngineRuntimeException e) {
+			log.error(String.format("Property BatchID not found in Class %s, %10.0f, %s/%s",doc.getClassName(),doc.getProperties().getFloat64Value("F_DOCNUMBER"), this.batchSetId, this.datFileName));
+			return false;
+		}
 
 		/*
 		 * 
@@ -290,29 +295,30 @@ public class ReplicateManager implements Runnable {
 			Iterator iter = origianlAnnos.iterator();
 			while (iter.hasNext()) {
 				Annotation originalAnno = (Annotation)iter.next();
-				originalAnno.fetchProperties(new String[] {"BatchID","Id"});
-				ContentElementList cels = originalAnno.get_ContentElements();
-				ContentElementList newCels = Factory.ContentElement.createList();
+				originalAnno.fetchProperties(new String[] {"BatchID","Id","DescriptiveText"});
 				Annotation annObject = Factory.Annotation.createInstance(revampedCPEUtil.getObjectStore(), "Annotation");
+				annObject.set_Permissions(originalAnno.get_Permissions());
+				annObject.set_Creator(originalAnno.get_Creator());
+				annObject.set_DateCreated(originalAnno.get_DateCreated());
+				annObject.getProperties().putValue("BatchID", originalAnno.get_Id().toString());
+				annObject.getProperties().putValue("DescriptiveText", originalAnno.getProperties().getStringValue("DescriptiveText"));
+				annObject.set_AnnotatedContentElement(originalAnno.get_AnnotatedContentElement());
+				annObject.set_AnnotatedObject(copyDoc);
+				annObject.save(RefreshMode.REFRESH);	
+				ContentElementList newCels = Factory.ContentElement.createList();
+				ContentElementList cels = originalAnno.get_ContentElements();
 				Iterator<ContentElement> ceIter = cels.iterator();
 				while (ceIter.hasNext()) {
 					ContentElement ce = ceIter.next();
 					if(ce instanceof ContentTransfer){
 						InputStream is = ((ContentTransfer)ce).accessContentStream();
 						ContentTransfer ctNew = Factory.ContentTransfer.createInstance();
-						ctNew.setCaptureSource(updateAnnotGUID(is, copyDoc.get_Id().toString()));
+						ctNew.setCaptureSource(updateAnnotGUID(is, annObject.get_Id().toString()));
 						newCels.add(ctNew);
 					}
-				}
+				}				
 				annObject.set_ContentElements(newCels);
-				annObject.set_Permissions(originalAnno.get_Permissions());
-				annObject.set_Creator(originalAnno.get_Creator());
-				annObject.set_DateCreated(originalAnno.get_DateCreated());
-				annObject.getProperties().putValue("BatchID", originalAnno.get_Id().toString());
-				annObject.set_AnnotatedContentElement(originalAnno.get_AnnotatedContentElement());
-				annObject.set_AnnotatedObject(copyDoc);
 				annObject.save(RefreshMode.REFRESH);
-	
 				originalAnno.getProperties().putValue("BatchID", annObject.get_Id().toString());
 				originalAnno.save(RefreshMode.REFRESH);
 				
@@ -350,8 +356,8 @@ public class ReplicateManager implements Runnable {
 			Source xmlSource = new DOMSource(doc);
 			Result oTarget = new StreamResult(oStream);
 			TransformerFactory.newInstance().newTransformer().transform(xmlSource, oTarget);
-			InputStream iS = new ByteArrayInputStream(oStream.toByteArray());
-			return iS;
+			InputStream isNew = new ByteArrayInputStream(oStream.toByteArray());
+			return isNew;
 		} catch (Exception e) {
 			return null;
 		}
