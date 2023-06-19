@@ -56,16 +56,18 @@ public class VerifyMigrationDocs {
 	static ICRISLogger log;
 	static FileOutputStream verifiedSuccesOutputDataFile;
 	static FileOutputStream verifiedFailedOutputDataFile;
+	static FileOutputStream annotationConversionDataFile;
 	static SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
 	static private CPEUtil revampedCPEUtil;
 	static private ObjectStore objectStore = null;
 	static private CSVParser csvParser = new CSVParser();
 	static private HashMap<Integer, ArrayList<String>> classIndexMap = new HashMap<Integer, ArrayList<String>>();
 	static private HashMap<Integer, String> classNumToSymNameMap = new HashMap<Integer, String>();
-	static FileOutputStream invalidAnnotSizeReport_A, invalidAnnotSizeReport_O;
+	static FileOutputStream invalidAnnotSizeReport_A, invalidAnnotSizeReport_O, annotConvertOutputDataFile;
 	static Double widthThreshold = 0.0;
 	static Double heigthThreshold = 0.0;
 	static String unmatchedIndexInfo;
+	static String procOption = "-v";
 //	static private String[] classSymNameArray = {"","","","","",""};
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -103,6 +105,11 @@ public class VerifyMigrationDocs {
 			widthThreshold = 0.1;
 			heigthThreshold = 0.1;
 		}
+		
+		if (args.length > 3) {
+			procOption = args[3];
+		}
+		
 		classNumToSymNameMap.put(1, "ICRIS_Pend_Doc");
 		classNumToSymNameMap.put(2, "ICRIS_Reg_Doc");
 		classNumToSymNameMap.put(3, "ICRIS_Tmplt_Doc");
@@ -115,10 +122,15 @@ public class VerifyMigrationDocs {
 			objectStore = revampedCPEUtil.getObjectStore();
 			String verifiedSuccessOutputFilePath = "." + File.separator + "data" + File.separator + "verifiedOutput" + File.separator + docidSetId +"_success.dat";
 			String verifiedFailedOutputFilePath = "." + File.separator + "data" + File.separator + "verifiedOutput" + File.separator + docidSetId +"_failed.dat";
+			String annotationConversionOutputFilePath = "." + File.separator + "data" + File.separator + "annotationConversionOutput" + File.separator + docidSetId +"_failed.dat";
 			Files.deleteIfExists(Paths.get(verifiedSuccessOutputFilePath));
 			verifiedSuccesOutputDataFile = new FileOutputStream(verifiedSuccessOutputFilePath);
 			Files.deleteIfExists(Paths.get(verifiedFailedOutputFilePath));
 			verifiedFailedOutputDataFile = new FileOutputStream(verifiedFailedOutputFilePath);
+			
+			Files.deleteIfExists(Paths.get(annotationConversionOutputFilePath));
+			annotationConversionDataFile = new FileOutputStream(verifiedFailedOutputFilePath);
+			
 			loadClassIndexMap();
 			String invalidAnnotSizeReportFilePath_A = "." + File.separator + "logs" + File.separator + "invalidAnnotSizeReports" + File.separator + "invalidAnnotSize_" + docidSetId +"_A.dat";
 			Files.deleteIfExists(Paths.get(invalidAnnotSizeReportFilePath_A));
@@ -126,6 +138,9 @@ public class VerifyMigrationDocs {
 			String invalidAnnotSizeReportFilePath_O = "." + File.separator + "logs" + File.separator + "invalidAnnotSizeReports" + File.separator + "invalidAnnotSize_" + docidSetId +"_O.dat";
 			Files.deleteIfExists(Paths.get(invalidAnnotSizeReportFilePath_O));
 			invalidAnnotSizeReport_O = new FileOutputStream(invalidAnnotSizeReportFilePath_O);
+			String annotConvertOutputDataFilePath = "." + File.separator + "data" + File.separator + "annotConvertOutput" + File.separator + "annotConvertOutpute_" + docidSetId +".dat";
+			Files.deleteIfExists(Paths.get(annotConvertOutputDataFilePath));
+			annotConvertOutputDataFile = new FileOutputStream(annotConvertOutputDataFilePath);
 		} catch (ICRISException e) {
 			if (e.exceptionCode.equals(ICRISException.ExceptionCodeValue.CPE_CONFIG_FILE_NOT_FOUND)) {
 				log.error(e.getMessage());				
@@ -147,26 +162,34 @@ public class VerifyMigrationDocs {
 			result = false;
 			errMsg = String.format("%s docid not found;", errMsg);
 		} else {
-			doc.fetchProperties(new String[] {"Id","abandoned"});
-			if (!verifyIndex(doc, classNumToSymNameMap.get(indexAnnotRec.classnum) , indexAnnotRec.indexArray)){
-				result = false;
-				errMsg = String.format("%s index not matched %s;", errMsg, unmatchedIndexInfo);
+			if ("-v".equalsIgnoreCase(procOption) || "-b".equalsIgnoreCase(procOption)){
+				doc.fetchProperties(new String[] {"Id","abandoned"});
+				if (!verifyIndex(doc, classNumToSymNameMap.get(indexAnnotRec.classnum) , indexAnnotRec.indexArray)){
+					result = false;
+					errMsg = String.format("%s index not matched %s;", errMsg, unmatchedIndexInfo);
+				}
+				
+				if (!verifyAnnotation(doc, classNumToSymNameMap.get(indexAnnotRec.classnum), indexAnnotRec.annotCount)) {
+					result = false;
+					errMsg = String.format("%s annotation count not matched;", errMsg);
+				}
+				
+				if (!verifyPagesCount(doc, classNumToSymNameMap.get(indexAnnotRec.classnum), indexAnnotRec.pageCount)) {
+					result = false;
+					errMsg = String.format("%s pages count not matched;", errMsg);
+				}
+				
+				AnnotationSet annotSet = doc.get_Annotations();
+				Iterator annotIt =  doc.get_Annotations().iterator();
+				while (annotIt.hasNext()) {
+					validateAnnotSize((Annotation) annotIt.next());
+
+				}
 			}
 			
-			if (!verifyAnnotation(doc, classNumToSymNameMap.get(indexAnnotRec.classnum), indexAnnotRec.annotCount)) {
-				result = false;
-				errMsg = String.format("%s annotation count not matched;", errMsg);
-			}
-			
-			if (!verifyPagesCount(doc, classNumToSymNameMap.get(indexAnnotRec.classnum), indexAnnotRec.pageCount)) {
-				result = false;
-				errMsg = String.format("%s pages count not matched;", errMsg);
-			}
-			
-			AnnotationSet annotSet = doc.get_Annotations();
-			Iterator annotIt =  doc.get_Annotations().iterator();
-			while (annotIt.hasNext()) {
-				validateAnnotSize((Annotation) annotIt.next());
+			if ("-a".equalsIgnoreCase(procOption) || "-b".equalsIgnoreCase(procOption)){
+				if(revampedCPEUtil.updateAnnot(doc, annotConvertOutputDataFile, Boolean.TRUE))
+					annotationConversionDataFile.write(String.format("%.0f, %d : ", indexAnnotRec.docid, indexAnnotRec.classnum).getBytes());
 			}
 		}
 		if (result) {

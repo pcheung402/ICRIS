@@ -34,6 +34,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.dom4j.Node;
+import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
 import com.filenet.api.core.*;
@@ -313,8 +314,12 @@ public class ReplicateManager implements Runnable {
 					if(ce instanceof ContentTransfer){
 						InputStream is = ((ContentTransfer)ce).accessContentStream();
 						ContentTransfer ctNew = Factory.ContentTransfer.createInstance();
-						ctNew.setCaptureSource(updateAnnotGUID(is, annObject.get_Id().toString()));
-						newCels.add(ctNew);
+						try {
+							ctNew.setCaptureSource(updateAnnotGUID(is, annObject.get_Id().toString()));
+							newCels.add(ctNew);
+						} catch (Exception e) {
+							log.error(String.format("%s : %s, %10.0f, %d, %s/%s", e.getMessage(), doc.getClassName(),doc.getProperties().getFloat64Value("F_DOCNUMBER"), ce.get_ElementSequenceNumber(), this.batchSetId, this.datFileName));
+						}
 					}
 				}				
 				annObject.set_ContentElements(newCels);
@@ -337,8 +342,9 @@ public class ReplicateManager implements Runnable {
 		return true;
 	}
 	
-	private InputStream updateAnnotGUID(InputStream is, String targetId) {
-		try {
+	private InputStream updateAnnotGUID(InputStream is, String targetId) throws ParserConfigurationException, SAXException, IOException, TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
+//		InputStream isNew = null;
+		
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			org.w3c.dom.Document doc = builder.parse(is);
@@ -358,9 +364,6 @@ public class ReplicateManager implements Runnable {
 			TransformerFactory.newInstance().newTransformer().transform(xmlSource, oTarget);
 			InputStream isNew = new ByteArrayInputStream(oStream.toByteArray());
 			return isNew;
-		} catch (Exception e) {
-			return null;
-		}
 	}
 	
 	private void loadClassIndexMap() throws IOException {

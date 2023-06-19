@@ -63,8 +63,8 @@ public class CleanupAnnotations {
 			while ((line=brDocidList.readLine())!=null) {
 				String[] parsedTokens = csvParser.lineParser(line);
 				String strDocid = parsedTokens[0];
-				Integer docClassNum = Integer.valueOf(parsedTokens[1]);
-				cleanupAnnotations(strDocid, docClassNum);
+//				Integer docClassNum = Integer.valueOf(parsedTokens[1]);
+				cleanupAnnotations(strDocid);
 			}
 			log.info(String.format("End cleanup annotation of documents ..."));
 		} catch (IOException e) {
@@ -84,7 +84,7 @@ public class CleanupAnnotations {
 			log = new ICRISLogger("cleanupAnnotations",null);
 			revampedCPEUtil = new CPEUtil("revamped.server.conf", log);
 			objectStore = revampedCPEUtil.getObjectStore();
-			brDocidList = new BufferedReader(new FileReader(new File(args[0])));
+			brDocidList = new BufferedReader(new FileReader(new File("./data/clean_anot_docid.lst")));
 		} catch (ICRISException e) {
 			if (e.exceptionCode.equals(ICRISException.ExceptionCodeValue.CPE_CONFIG_FILE_NOT_FOUND)) {
 				log.error(e.getMessage());				
@@ -97,11 +97,12 @@ public class CleanupAnnotations {
 		}
 	}
 	
-	static private void cleanupAnnotations(String strDocid, Integer docClassNum) {
+	static private void cleanupAnnotations(String strDocid) {
 //		System.out.println("..." + strDocid);
-		Document doc = searchDoc(String.format("%s",strDocid), classNumToSymNameMap.get(docClassNum));
-		if (doc!=null) {
-//			System.out.println("doc name : " + doc.get_Name());
+		DocumentSet ds = searchDoc(String.format("%s",strDocid), "ICRIS_Doc");
+		Iterator<Document> it = ds.iterator();
+		while (it.hasNext()) {
+			Document doc = it.next();
 			AnnotationSet annotSet = doc.get_Annotations();
 			Iterator itAnnot = annotSet.iterator();
 			Integer i = 0;
@@ -111,27 +112,21 @@ public class CleanupAnnotations {
 				annot.save(RefreshMode.NO_REFRESH);
 				++i;
 			}
-			log.info(String.format("Total %d annotation(s) removed from document %s", i, strDocid));			
-		} 
+			log.info(String.format("Total %d annotation(s) removed from document %s, %s", i, strDocid, doc.get_Id().toString()));
+		}
 	}
 
-	static private Document searchDoc(String docNum, String docClass) {
+	static private DocumentSet searchDoc(String docNum, String docClass) {
 		SearchSQL searchSQL = new SearchSQL();
 		SearchScope searchScope = new SearchScope(revampedCPEUtil.getObjectStore());
 		searchSQL.setFromClauseInitialValue(docClass, null, true);
-		searchSQL.setSelectList("F_DOCNUMBER, Name, Annotations");
-		searchSQL.setMaxRecords(1);
+		searchSQL.setSelectList("F_DOCNUMBER, Name, Annotations, Id");
+//		searchSQL.setMaxRecords(1);
 		searchSQL.setOrderByClause("F_DOCNUMBER" + " ASC");
 		String whereClause = "F_DOCNUMBER"+"=" + docNum;
 		searchSQL.setWhereClause(whereClause);
 		DocumentSet ds = (DocumentSet)searchScope.fetchObjects(searchSQL, null, null, false);
-		Iterator it = ds.iterator();
-		if (it.hasNext()){
-			return (Document)it.next();
-		} else {
-			log.error(docNum + " not exists");
-			return null;
-		}
+		return ds;
 	}
 
 }

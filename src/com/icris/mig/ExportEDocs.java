@@ -72,7 +72,7 @@ public class ExportEDocs {
 	        System.out.println("SQL : " + sqlObject.toString());
 	        SearchScope searchScope = new SearchScope(objectStore);
 	        System.out.println ("Start retrieving : " + new Date());
-	        RepositoryRowSet rowSet = searchScope.fetchRows(sqlObject, null, null, new Boolean(true));        
+	        RepositoryRowSet rowSet = searchScope.fetchRows(sqlObject, null, null, Boolean.TRUE);        
 	        PageIterator pageIter= rowSet.pageIterator();
 	        pageIter.setPageSize(1000);
 	        while (pageIter.nextPage()) {
@@ -186,7 +186,7 @@ public class ExportEDocs {
     	}
     	try{
     	Files.copy(zIs , Paths.get(eDocFolderFullPath + File.separator + fileName), StandardCopyOption.REPLACE_EXISTING);
-    	eDocsRecords.append(fileName + "," + caseNumber + "," + sSubmissionDate + "," + formType + "," + is_size.toString() + "\n");
+    	eDocsRecords.append(fileName + "," + caseNumber + "," + sSubmissionDate + "," + formType + "," + sZipEntry + "," + is_size.toString() + "\n");
     	eDocsRecords.flush();
     	} catch (EOFException e) {
     		eDocsInvalid.append(caseNumber + "," + sSubmissionDate  + "," + e.getMessage() + "\n");

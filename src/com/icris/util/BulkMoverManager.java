@@ -102,6 +102,7 @@ public class BulkMoverManager implements Runnable {
 		log.info(String.format("starting,%s/%s",batchSetId,datFileName));
 		Boolean isOverdue=false;
 		Integer numOfDocMoved = 0;
+		Integer pages = 0;
 		Double lastDocNumberMoved=0.0, firstDocNumberMoved=0.0;
 		BufferedReader reader;
  		
@@ -121,6 +122,7 @@ public class BulkMoverManager implements Runnable {
 					doc = Factory.Document.fetchInstance(revampedCPEUtil.getObjectStore(), new Id(parsedLine[1]), null);
 				}
 				doc.refresh(new String[] {"F_DOCNUMBER","F_DOCCLASSNUMBER","Id","F_PAGES"});
+				pages = doc.getProperties().getInteger32Value("F_PAGES");
 				lastDocNumberMoved = doc.getProperties().getFloat64Value("F_DOCNUMBER");
 				if (numOfDocMoved==0) {
 					firstDocNumberMoved = doc.getProperties().getFloat64Value("F_DOCNUMBER");
@@ -135,7 +137,7 @@ public class BulkMoverManager implements Runnable {
 						while (!revampedCPEUtil.moveContent(doc)) {
 							try {TimeUnit.SECONDS.sleep(2);} catch (Exception _e) {_e.printStackTrace();};
 						};
-						bulkMoveOutputDataFile.write(String.format("%010.0f,%s/%s,%d\n", lastDocNumberMoved, batchSetId,datFileName, doc.getProperties().getInteger32Value("F_PAGES")).getBytes());
+						bulkMoveOutputDataFile.write(String.format("%010.0f,%s/%s,%d\n", lastDocNumberMoved, batchSetId,datFileName, pages).getBytes());
 						bulkMoveOutputDataFile.flush();
 						break;
 					} catch (ICRISException e) {
@@ -147,6 +149,16 @@ public class BulkMoverManager implements Runnable {
 								||e.getExceptionCode().equals(ExceptionCode.CONTENT_FCP_OPERATION_FAILED_WITH_CONTENT)) {
 							log.warn(String.format("CFS-IS retry #%d: %s/%s,%12.0f,%s",retries, batchSetId,datFileName,lastDocNumberMoved,e.getMessage()));
 							continue;
+						} else if (e.getExceptionCode().equals(ExceptionCode.E_OBJECT_MODIFIED)){
+							log.error(String.format("E_OBJECT_MODIFIED ,%s/%s,%.0f, %s",batchSetId,datFileName,lastDocNumberMoved,e.getMessage()));
+							e.printStackTrace();
+							break;
+						
+						}else if (e.getExceptionCode().equals(ExceptionCode.API_FETCH_MERGE_PROPERTY_ERROR)){
+							log.error(String.format("API_FETCH_MERGE_PROPERTY_ERROR ,%s/%s,%.0f, %s",batchSetId,datFileName,lastDocNumberMoved,e.getMessage()));
+							e.printStackTrace();
+							break;
+						
 						} else {
 							log.error(String.format("unhandled error ,%s/%s,%.0f, %s",batchSetId,datFileName,lastDocNumberMoved,e.getMessage()));
 							e.printStackTrace();

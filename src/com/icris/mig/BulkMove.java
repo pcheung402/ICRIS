@@ -26,8 +26,9 @@ public class BulkMove {
 	static boolean isByDocid = false;
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Double intialSASize, finalSASize;
+		HashMap<String, Double>  intialSASize, finalSASize;
 		initialize(args);
+		log.info("Connected to : " + revampedCPEUtil.getDomain().get_Name() + ";" +revampedCPEUtil.getObjectStore().get_Name());
 		ExecutorService es = Executors.newCachedThreadPool();
 		File folder = new File("data/bulkMoveBatches/batchSets/" + batchSetId);
 		File[] listOfFiles = folder.listFiles();
@@ -45,7 +46,10 @@ public class BulkMove {
 			log.info("Wait 5 minutes and calculate total storage moved in MB");
 			Thread.sleep(5*60*1000);
 			finalSASize = revampedCPEUtil.getStorageAreaSize();
-			log.info(String.format("Initial Storage Size: %.3f(MB), Final Storage Size: %.3f(MB), Total Moved : %.3f(MB)", intialSASize/1024, finalSASize/1024, (finalSASize - intialSASize)/1024));
+			
+			intialSASize.keySet().forEach((key)->{
+				log.info(String.format("Initial Storage Size: %.3f(MB), Final Storage Size: %.3f(MB), Total Moved : %.3f(MB)", intialSASize.get(key)/1024, finalSASize.get(key)/1024, (finalSASize.get(key) - intialSASize.get(key))/1024));				
+			});
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
