@@ -1,0 +1,2 @@
+2023-02-24 17:14:08,563 ERROR [main] - unhandled Exception
+2023-02-24 17:14:08,584 ERROR [main] - com.filenet.api.exception.EngineRuntimeException: FNRCA0031E: API_UNABLE_TO_USE_CONNECTION: The URI for server communication cannot be determined from the connection object http://10.114.132.164:9080/wsi/FNCEWS40MTOM. Message was: Connection refused: connect

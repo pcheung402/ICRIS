@@ -1,0 +1,12 @@
+2022-08-01 15:01:07,942  INFO [main] - Connected to P8 Domain ICM532;OS
+2022-08-01 15:01:07,949  INFO [main] - Start submitting 1 batches
+2022-08-01 15:01:07,956  INFO [pool-1-thread-1] - waiting,test_A/test_1.dat,Wed Jul 27 00:15:00 CST 2022
+2022-08-01 15:01:08,690  INFO [pool-1-thread-1] - starting,test_A/test_1.dat
+2022-08-01 15:01:09,501  INFO [main] - All batches finished
+2022-08-01 15:01:09,502  INFO [main] - Wait 5 minutes and calculate total storage moved in MB
+2022-08-01 15:04:34,568  INFO [main] - Connected to P8 Domain ICM532;OS
+2022-08-01 15:04:34,573  INFO [main] - Start submitting 1 batches
+2022-08-01 15:04:34,578  INFO [pool-1-thread-1] - waiting,test_A/test_1.dat,Wed Jul 27 00:15:00 CST 2022
+2022-08-01 15:04:35,299  INFO [pool-1-thread-1] - starting,test_A/test_1.dat
+2022-08-01 15:04:40,319  INFO [main] - All batches finished
+2022-08-01 15:04:40,319  INFO [main] - Wait 5 minutes and calculate total storage moved in MB

@@ -1,0 +1,34 @@
+2023-07-10 11:51:21,832  INFO [main] - Connected to P8 Domain ICRIS_UAT
+2023-07-10 11:51:21,837  INFO [main] - Start submiiting 1  batches
+2023-07-10 11:51:21,839 ERROR [main] - Load batchSetConfig error : config/batchSetConfig/markdelete_001.conf
+2023-07-10 11:51:21,839  INFO [main] - All batches finished
+2023-07-10 11:53:14,327  INFO [main] - Connected to P8 Domain ICRIS_UAT
+2023-07-10 11:53:14,331  INFO [main] - Start submiiting 1  batches
+2023-07-10 11:53:14,337  INFO [pool-1-thread-1] - waiting,markdelete_001/markdeleted.lst,Oct 6, 2022, 9:00:00 AM
+2023-07-10 11:53:14,337  INFO [pool-1-thread-1] - starting,markdelete_001/markdeleted.lst
+2023-07-10 11:53:14,339  INFO [pool-1-thread-1] - overdue,markdelete_001/markdeleted.lst,0000000000,0000000000,0
+2023-07-10 11:53:14,339  INFO [main] - All batches finished
+2023-07-10 11:54:29,997  INFO [main] - Connected to P8 Domain ICRIS_UAT
+2023-07-10 11:54:30,001  INFO [main] - Start submiiting 1  batches
+2023-07-10 11:54:30,006  INFO [pool-1-thread-1] - waiting,markdelete_001/markdeleted.lst,Oct 6, 2022, 9:00:00 AM
+2023-07-10 11:54:30,007  INFO [pool-1-thread-1] - starting,markdelete_001/markdeleted.lst
+2023-07-10 11:54:30,008  INFO [main] - All batches finished
+2023-07-10 11:54:58,872  INFO [main] - Connected to P8 Domain ICRIS_UAT
+2023-07-10 11:54:58,876  INFO [main] - Start submiiting 1  batches
+2023-07-10 11:54:58,882  INFO [pool-1-thread-1] - waiting,markdelete_001/markdeleted.lst,Oct 6, 2022, 9:00:00 AM
+2023-07-10 11:54:58,883  INFO [pool-1-thread-1] - starting,markdelete_001/markdeleted.lst
+2023-07-10 11:55:00,949  INFO [main] - All batches finished
+2023-07-10 12:01:48,348  INFO [main] - Connected to P8 Domain ICRIS_UAT
+2023-07-10 12:01:48,353  INFO [main] - Start submiiting 1  batches
+2023-07-10 12:01:48,358  INFO [pool-1-thread-1] - waiting,markdelete_001/markdeleted.lst,Oct 6, 2022, 9:00:00 AM
+2023-07-10 12:01:48,358  INFO [pool-1-thread-1] - starting,markdelete_001/markdeleted.lst
+2023-07-10 12:01:50,304 ERROR [pool-1-thread-1] - The requested item was not found. Object identity: classId=Document&objectId={286E6149-70E6-568C-8F03-D6547421C277}&objectStore={044CF581-521B-4EAF-92D0-61A501165CF9}.  Class name: Document.,markdelete_001/markdeleted.lst
+2023-07-10 12:01:50,306  INFO [main] - All batches finished
+2023-07-10 12:05:28,914  INFO [main] - Connected to P8 Domain ICRIS_UAT
+2023-07-10 12:05:28,919  INFO [main] - Start submiiting 1  batches
+2023-07-10 12:05:28,924  INFO [pool-1-thread-1] - waiting,markdelete_001/markdeleted.lst,Oct 6, 2022, 9:00:00 AM
+2023-07-10 12:05:28,925  INFO [pool-1-thread-1] - starting,markdelete_001/markdeleted.lst
+2023-07-10 12:05:30,786 ERROR [pool-1-thread-1] - The requested item was not found. Object identity: classId=Document&objectId={286E6149-70E6-568C-8F03-D6547421C277}&objectStore={044CF581-521B-4EAF-92D0-61A501165CF9}.  Class name: Document.,markdelete_001/markdeleted.lst
+2023-07-10 12:05:59,786 ERROR [pool-1-thread-1] - The requested item was not found. Object identity: classId=Document&objectId={2841B2A1-70E6-568C-8F03-D6547421C277}&objectStore={044CF581-521B-4EAF-92D0-61A501165CF9}.  Class name: Document.,markdelete_001/markdeleted.lst
+2023-07-10 12:06:10,097  INFO [pool-1-thread-1] - finished,markdelete_001/markdeleted.lst,0676392607,0676392614,906
+2023-07-10 12:06:10,098  INFO [main] - All batches finished

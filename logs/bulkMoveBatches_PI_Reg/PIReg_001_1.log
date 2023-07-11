@@ -1,0 +1,5 @@
+2023-02-08 17:27:56,562  INFO [main] - Connected to P8 Domain ICRIS_PROD;OS
+2023-02-08 17:27:56,576  INFO [main] - Start submitting 1 batches
+2023-02-08 17:27:56,589  INFO [pool-1-thread-1] - waiting,PIReg_001_1/xaa,Thu Oct 06 09:00:00 CST 2022
+2023-02-08 17:27:57,549  INFO [pool-1-thread-1] - starting,PIReg_001_1/xaa
+2023-02-08 17:28:00,600  INFO [main] - All batches finished

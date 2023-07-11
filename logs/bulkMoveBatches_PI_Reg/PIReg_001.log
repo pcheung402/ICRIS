@@ -1,0 +1,9 @@
+2023-01-11 12:53:58,494  INFO [main] - Connected to P8 Domain ICRIS_PROD;OS
+2023-01-11 12:53:58,498  INFO [main] - Start submitting 3 batches
+2023-01-11 12:53:58,505  INFO [pool-1-thread-2] - waiting,PIReg_001/yab,Thu Oct 06 09:00:00 CST 2022
+2023-01-11 12:53:58,512  INFO [pool-1-thread-1] - waiting,PIReg_001/yaa,Thu Oct 06 09:00:00 CST 2022
+2023-01-11 12:53:58,513  INFO [pool-1-thread-3] - waiting,PIReg_001/yac,Thu Oct 06 09:00:00 CST 2022
+2023-01-11 12:53:59,249  INFO [pool-1-thread-3] - starting,PIReg_001/yac
+2023-01-11 12:53:59,249  INFO [pool-1-thread-2] - starting,PIReg_001/yab
+2023-01-11 12:53:59,255  INFO [pool-1-thread-1] - starting,PIReg_001/yaa
+2023-01-11 12:54:16,861  INFO [main] - All batches finished

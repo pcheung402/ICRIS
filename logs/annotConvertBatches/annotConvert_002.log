@@ -1,0 +1,9 @@
+2022-10-18 14:02:46,061  INFO [main] - Start submitting 1 batches
+2022-10-18 14:02:46,063 ERROR [main] - unhandled CPEUtil Exception
+2022-10-18 14:02:46,063 ERROR [main] - [Ljava.lang.StackTraceElement;@65b3120a
+2022-10-18 14:02:46,166  INFO [main] - All batches finished
+2022-10-18 14:19:37,873  INFO [main] - Start submitting 1 batches
+2022-10-18 14:19:39,321  INFO [pool-1-thread-1] - waiting,annotConvert_002/batch_aa,Thu Oct 06 09:00:00 CST 2022
+2022-10-18 14:19:39,321  INFO [pool-1-thread-1] - starting,annotConvert_002/batch_aa
+2022-10-18 14:19:39,661  INFO [pool-1-thread-1] - finished,annotConvert_002/batch_aa
+2022-10-18 14:19:39,662  INFO [main] - All batches finished

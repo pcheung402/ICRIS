@@ -1,0 +1,13 @@
+2023-01-10 12:07:33,572  INFO [main] - Connected to P8 Domain ICRIS_PROD
+2023-01-10 12:07:33,572  INFO [main] - Connected to : ICRIS_PROD;OS
+2023-01-10 12:07:33,576  INFO [main] - Start submitting 3 batches
+2023-01-10 12:07:36,069  INFO [pool-1-thread-1] - waiting,annotConvert_008/xaaa,Thu Oct 06 09:00:00 CST 2022
+2023-01-10 12:07:36,069  INFO [pool-1-thread-1] - starting,annotConvert_008/xaaa
+2023-01-10 12:07:39,097  INFO [pool-1-thread-2] - waiting,annotConvert_008/xaab,Thu Oct 06 09:00:00 CST 2022
+2023-01-10 12:07:39,097  INFO [pool-1-thread-2] - starting,annotConvert_008/xaab
+2023-01-10 12:07:42,203  INFO [pool-1-thread-3] - waiting,annotConvert_008/xaac,Thu Oct 06 09:00:00 CST 2022
+2023-01-10 12:07:42,203  INFO [pool-1-thread-3] - starting,annotConvert_008/xaac
+2023-01-10 12:08:39,906  INFO [pool-1-thread-3] - finished,annotConvert_008/xaac
+2023-01-10 12:08:47,000  INFO [pool-1-thread-2] - finished,annotConvert_008/xaab
+2023-01-10 12:08:48,474  INFO [pool-1-thread-1] - finished,annotConvert_008/xaaa
+2023-01-10 12:08:48,474  INFO [main] - All batches finished

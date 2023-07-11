@@ -1,0 +1,23 @@
+2022-07-19 16:18:23,123  INFO [main] - Connected to P8 Domain ICM532
+2022-07-19 16:18:23,124  INFO [main] - Connected to : ICM532;OS
+2022-07-19 16:18:23,138  INFO [main] - OS : 25.968(MB)
+2022-07-19 16:18:23,145  INFO [main] - OS : 25.968(MB)
+2022-07-19 16:18:23,152  INFO [main] - OS : 25.968(MB)
+2022-07-19 16:18:23,158  INFO [main] - OS : 25.968(MB)
+2022-07-19 16:18:23,165  INFO [main] - OS : 25.968(MB)
+2022-07-19 16:18:23,172  INFO [main] - OS : 25.968(MB)
+2022-07-19 16:18:23,179  INFO [main] - OS : 25.968(MB)
+2022-07-19 16:18:23,179  INFO [main] - Start submitting 1 batches
+2022-07-19 16:18:23,185  INFO [pool-1-thread-1] - waiting,test1/batch_1.dat,Mon Jun 27 00:15:00 CST 2022
+2022-07-19 16:18:23,931  INFO [pool-1-thread-1] - starting,test1/batch_1.dat
+2022-07-19 16:18:38,038  INFO [pool-1-thread-1] - finished,test1/batch_1.dat,0000000000,0000000000,0
+2022-07-19 16:18:38,041  INFO [main] - All batches finished
+2022-07-19 16:18:38,041  INFO [main] - Wait 5 minutes and calculate total storage moved in MB
+2022-07-19 16:23:38,403  INFO [main] - OS : 26.755(MB)
+2022-07-19 16:23:38,416  INFO [main] - OS : 26.755(MB)
+2022-07-19 16:23:38,424  INFO [main] - OS : 26.755(MB)
+2022-07-19 16:23:38,434  INFO [main] - OS : 26.755(MB)
+2022-07-19 16:23:38,442  INFO [main] - OS : 26.755(MB)
+2022-07-19 16:23:38,448  INFO [main] - OS : 26.755(MB)
+2022-07-19 16:23:38,454  INFO [main] - OS : 26.755(MB)
+2022-07-19 16:23:38,455  INFO [main] - Initial Storage Size: 25.968(MB), Final Storage Size: 26.755(MB), Total Moved : 0.787(MB)

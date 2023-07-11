@@ -1,0 +1,33 @@
+2022-12-08 11:58:26,986  INFO [main] - Start submitting 10 batches
+2022-12-08 11:58:29,127  INFO [pool-1-thread-1] - waiting,annotConvert_006/batch_aa,Thu Oct 06 09:00:00 CST 2022
+2022-12-08 11:58:29,127  INFO [pool-1-thread-1] - starting,annotConvert_006/batch_aa
+2022-12-08 11:58:29,596  INFO [pool-1-thread-2] - waiting,annotConvert_006/batch_ab,Thu Oct 06 09:00:00 CST 2022
+2022-12-08 11:58:29,597  INFO [pool-1-thread-2] - starting,annotConvert_006/batch_ab
+2022-12-08 11:58:29,891  INFO [pool-1-thread-3] - waiting,annotConvert_006/batch_ac,Thu Oct 06 09:00:00 CST 2022
+2022-12-08 11:58:29,891  INFO [pool-1-thread-3] - starting,annotConvert_006/batch_ac
+2022-12-08 11:58:30,212  INFO [pool-1-thread-4] - waiting,annotConvert_006/batch_ad,Thu Oct 06 09:00:00 CST 2022
+2022-12-08 11:58:30,212  INFO [pool-1-thread-4] - starting,annotConvert_006/batch_ad
+2022-12-08 11:58:30,602  INFO [pool-1-thread-5] - waiting,annotConvert_006/batch_ae,Thu Oct 06 09:00:00 CST 2022
+2022-12-08 11:58:30,603  INFO [pool-1-thread-5] - starting,annotConvert_006/batch_ae
+2022-12-08 11:58:30,854  INFO [pool-1-thread-6] - waiting,annotConvert_006/batch_af,Thu Oct 06 09:00:00 CST 2022
+2022-12-08 11:58:30,854  INFO [pool-1-thread-6] - starting,annotConvert_006/batch_af
+2022-12-08 11:58:31,177  INFO [pool-1-thread-7] - waiting,annotConvert_006/batch_ag,Thu Oct 06 09:00:00 CST 2022
+2022-12-08 11:58:31,177  INFO [pool-1-thread-7] - starting,annotConvert_006/batch_ag
+2022-12-08 11:58:31,555  INFO [pool-1-thread-8] - waiting,annotConvert_006/batch_ah,Thu Oct 06 09:00:00 CST 2022
+2022-12-08 11:58:31,555  INFO [pool-1-thread-8] - starting,annotConvert_006/batch_ah
+2022-12-08 11:58:33,170  INFO [pool-1-thread-9] - waiting,annotConvert_006/batch_ai,Thu Oct 06 09:00:00 CST 2022
+2022-12-08 11:58:33,170  INFO [pool-1-thread-9] - starting,annotConvert_006/batch_ai
+2022-12-08 11:58:33,521  INFO [pool-1-thread-10] - waiting,annotConvert_006/batch_aj,Thu Oct 06 09:00:00 CST 2022
+2022-12-08 11:58:33,521  INFO [pool-1-thread-10] - starting,annotConvert_006/batch_aj
+2022-12-08 12:14:43,180  INFO [pool-1-thread-10] - finished,annotConvert_006/batch_aj
+2022-12-08 12:19:35,778 ERROR [pool-1-thread-1] - Invalid Big5 Code : 8000
+2022-12-08 12:24:45,102  INFO [pool-1-thread-4] - finished,annotConvert_006/batch_ad
+2022-12-08 12:25:14,844  INFO [pool-1-thread-6] - finished,annotConvert_006/batch_af
+2022-12-08 12:25:21,840  INFO [pool-1-thread-1] - finished,annotConvert_006/batch_aa
+2022-12-08 12:25:35,310  INFO [pool-1-thread-8] - finished,annotConvert_006/batch_ah
+2022-12-08 12:25:41,846  INFO [pool-1-thread-7] - finished,annotConvert_006/batch_ag
+2022-12-08 12:25:48,855  INFO [pool-1-thread-2] - finished,annotConvert_006/batch_ab
+2022-12-08 12:25:56,662  INFO [pool-1-thread-5] - finished,annotConvert_006/batch_ae
+2022-12-08 12:25:59,270  INFO [pool-1-thread-3] - finished,annotConvert_006/batch_ac
+2022-12-08 12:26:00,097  INFO [pool-1-thread-9] - finished,annotConvert_006/batch_ai
+2022-12-08 12:26:00,097  INFO [main] - All batches finished

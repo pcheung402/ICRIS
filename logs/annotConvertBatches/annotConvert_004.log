@@ -1,0 +1,6 @@
+2022-10-20 11:09:01,401  INFO [main] - Start submitting 1 batches
+2022-10-20 11:09:03,118  INFO [pool-1-thread-1] - waiting,annotConvert_004/batch_aa,Thu Oct 06 09:00:00 CST 2022
+2022-10-20 11:09:03,119  INFO [pool-1-thread-1] - starting,annotConvert_004/batch_aa
+2022-10-20 11:09:03,160  INFO [pool-1-thread-1] - clear replication group of document - IS412_FileNet 0000113053
+2022-10-20 11:09:03,527  INFO [pool-1-thread-1] - finished,annotConvert_004/batch_aa
+2022-10-20 11:09:03,528  INFO [main] - All batches finished
