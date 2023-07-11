@@ -86,7 +86,7 @@ public class MarkDeleteManager implements Runnable {
 		
 
 		java.util.Properties props = new java.util.Properties();
-		props.load(new FileInputStream("config/markDeleteConfig/" + this.batchSetId + ".conf"));
+		props.load(new FileInputStream("config/batchSetConfig/" + this.batchSetId + ".conf"));
 		this.revampedCPEUtil = revampedCPEUtil;
 		loadBatchSetConfig();
 //		loadClassIndexMap();
@@ -103,7 +103,7 @@ public class MarkDeleteManager implements Runnable {
 //		Integer retries = 0; 
 		Date ts1, ts2,ts3;
 		try {
-			reader = new BufferedReader(new FileReader("data/removeWormBatches/batchSets/" + this.batchSetId +"/" + this.datFileName));
+			reader = new BufferedReader(new FileReader("data/markdeletebatches/batchSets/" + this.batchSetId +"/" + this.datFileName));
 			for (String line; (line = reader.readLine()) != null; ){
 				Date date = new Date();
 				if (date.after(batchEndTime)) {
@@ -116,18 +116,24 @@ public class MarkDeleteManager implements Runnable {
 				if (this.isByDocId) {
 					doc = searchDoc (parsedLine[0],"ICRIS_DOC");
 				} else {
-					doc = Factory.Document.fetchInstance(revampedCPEUtil.getObjectStore(), new Id(parsedLine[1]), null);
+					try {
+						doc = Factory.Document.fetchInstance(revampedCPEUtil.getObjectStore(), new Id(parsedLine[0]), null);
+						doc.refresh(new String[] {"F_DOCNUMBER","F_DOCCLASSNUMBER","DocumentTitle","BatchID","StorageAreaFlag"});
+						lastDocNumberRemoved = doc.getProperties().getFloat64Value("F_DOCNUMBER");
+						if (numOfDocRemoved==0) {
+							firstDocNumberRemoved = doc.getProperties().getFloat64Value("F_DOCNUMBER");
+						}
+	
+						if (markDeleteDoc(doc)) {
+							numOfDocRemoved++;
+						}
+					} catch (EngineRuntimeException e) {
+						log.error(String.format("%s,%s/%s",e.getMessage(), batchSetId,datFileName));
+					} 
 				}
 				
-				doc.refresh(new String[] {"F_DOCNUMBER","F_DOCCLASSNUMBER","DocumentTitle","BatchID","StorageAreaFlag"});
-				lastDocNumberRemoved = doc.getProperties().getFloat64Value("F_DOCNUMBER");
-				if (numOfDocRemoved==0) {
-					firstDocNumberRemoved = doc.getProperties().getFloat64Value("F_DOCNUMBER");
-				}
+				
 
-				if (markDeleteDoc(doc)) {
-					numOfDocRemoved++;
-				}
 
 
 			}
@@ -138,7 +144,7 @@ public class MarkDeleteManager implements Runnable {
 				log.info(String.format("finished,%s/%s,%010.0f,%010.0f,%d",batchSetId,datFileName,firstDocNumberRemoved,lastDocNumberRemoved,numOfDocRemoved));
 			}			
 			
-		} catch (IOException e) {
+		} catch (IOException|EngineRuntimeException e) {
 			log.error(String.format("%s,%s/%s",e.getMessage(), batchSetId,datFileName));
 			e.printStackTrace();
 		} 
@@ -159,7 +165,7 @@ public class MarkDeleteManager implements Runnable {
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 		try {
 		java.util.Properties props = new java.util.Properties();
-		props.load(new FileInputStream("config/removeFromWormConfig/" + this.batchSetId + ".conf"));
+		props.load(new FileInputStream("config/batchSetConfig/" + this.batchSetId + ".conf"));
 		System.out.println(props.getProperty("batchStartTime")+"/"+props.getProperty("batchEndTime"));
 		this.batchStartTime = formatter.parse(props.getProperty("batchStartTime"));
 		this.batchEndTime = formatter.parse(props.getProperty("batchEndTime"));

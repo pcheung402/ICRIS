@@ -181,7 +181,7 @@ public class AnnotConverter implements Runnable {
 	}
 	
 	private void processParsedLine(String[] parsedLine) {
-		String docNum = parsedLine[1];
+		String docNum = parsedLine[0];
 		String docClass ="ICRIS_Barcode_Doc";
 
 		
@@ -202,8 +202,13 @@ public class AnnotConverter implements Runnable {
 //				if(!doc.get_Annotations().iterator().hasNext()) System.out.printf("%s, %s, %s does not have annotations\n",docNum, doc.get_ClassDescription().get_Name(), doc.get_Id().toString());
 				this.revampedCPEUtil.updateAnnot(doc, this.annotConvertOutputDataFile, this.previewOnly);
 			}
-		} 
-
+		}
+		
+//		Document doc = Factory.Document.fetchInstance(revampedCPEUtil.getObjectStore(), new Id(parsedLine[0]), null);
+//		if(!doc.get_Name().endsWith("_WORM")) {
+//			doc.fetchProperties(new String[] {"Id", "DOC_BARCODE","F_DOCNUMBER"});
+//			this.revampedCPEUtil.updateAnnot(doc, this.annotConvertOutputDataFile, this.previewOnly);
+//		}
 	}
 	
 }

@@ -29,13 +29,13 @@ public class MarkDelete {
 		// TODO Auto-generated method stub
 		initialize(args);
 		ExecutorService es = Executors.newCachedThreadPool();
-		File folder = new File("data/removeWormBatches/batchSets/" + batchSetId);
+		File folder = new File("data/markdeletebatches/batchSets/" + batchSetId);
 		File[] listOfFiles = folder.listFiles();
 		log.info(String.format("Start submiiting %d  batches", listOfFiles.length));
 		for (File fd : listOfFiles) {
 			try {
-				MarkDeleteManager removeFromWormManager = new MarkDeleteManager(batchSetId, fd.getName(), log, markDeleteOutputDataFile, revampedCPEUtil, isByDocid);
-				es.execute(removeFromWormManager);
+				MarkDeleteManager markDeleteManager = new MarkDeleteManager(batchSetId, fd.getName(), log, markDeleteOutputDataFile, revampedCPEUtil, isByDocid);
+				es.execute(markDeleteManager);
 			} catch (ICRISException e) {
 				if (e.exceptionCode.equals(ICRISException.ExceptionCodeValue.CPE_USNAME_PASSWORD_INVALID)) {
 					log.error(e.getMessage());				
@@ -70,7 +70,7 @@ public class MarkDelete {
 		if (args.length>0) {
 			batchSetId = args[0];
 		} else {
-			batchSetId = "batchSet001";
+			batchSetId = "markdelete_001";
 		}
 		if (args.length > 1 && args[1].equals("-d")) {
 			isByDocid = true;
@@ -78,7 +78,7 @@ public class MarkDelete {
 
 		try {
 			log = new ICRISLogger(batchSetId,"markDeleteBatches");
-			revampedCPEUtil = new CPEUtil("revamped.server.conf", log);
+			revampedCPEUtil = new CPEUtil("uat.server.conf", log);
 			log.info("Connected to P8 Domain "+ revampedCPEUtil.getDomain().get_Name());
 			String markDeleteOutputFilePath = "." + File.separator + "data" + File.separator + "markDeleteOutput" + File.separator + batchSetId +".dat";
 			Files.deleteIfExists(Paths.get(markDeleteOutputFilePath));

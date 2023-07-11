@@ -316,7 +316,7 @@ public class CPEUtil {
 		ReplicationGroup rg = doc.get_ReplicationGroup();
 		try {			
 			if(rg!=null) {
-				log.info(String.format("clear replication group of document - %s", doc.get_Name()));
+//				log.info(String.format("clear replication group of document - %s", doc.get_Name()));
 				doc.set_ReplicationGroup(null);
 				doc.save(RefreshMode.REFRESH);
 //				System.out.println("clear application group");
